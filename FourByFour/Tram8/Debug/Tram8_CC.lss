@@ -1,0 +1,2278 @@
+
+Tram8_CC.elf:     file format elf32-avr
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .text         00000a8e  00000000  00000000  00000094  2**1
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .data         00000118  00800060  00000a8e  00000b22  2**0
+                  CONTENTS, ALLOC, LOAD, DATA
+  2 .bss          00000010  00800178  00800178  00000c3a  2**0
+                  ALLOC
+  3 .comment      00000030  00000000  00000000  00000c3a  2**0
+                  CONTENTS, READONLY
+  4 .note.gnu.avr.deviceinfo 0000003c  00000000  00000000  00000c6c  2**2
+                  CONTENTS, READONLY
+  5 .debug_aranges 00000148  00000000  00000000  00000ca8  2**3
+                  CONTENTS, READONLY, DEBUGGING
+  6 .debug_info   000015a8  00000000  00000000  00000df0  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  7 .debug_abbrev 000008db  00000000  00000000  00002398  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  8 .debug_line   0000117e  00000000  00000000  00002c73  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  9 .debug_frame  000001f8  00000000  00000000  00003df4  2**2
+                  CONTENTS, READONLY, DEBUGGING
+ 10 .debug_str    000006a0  00000000  00000000  00003fec  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 11 .debug_loc    00000956  00000000  00000000  0000468c  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 12 .debug_ranges 00000098  00000000  00000000  00004fe2  2**0
+                  CONTENTS, READONLY, DEBUGGING
+
+Disassembly of section .text:
+
+00000000 <__vectors>:
+   0:	2a c0       	rjmp	.+84     	; 0x56 <__ctors_end>
+   2:	44 c0       	rjmp	.+136    	; 0x8c <__bad_interrupt>
+   4:	43 c0       	rjmp	.+134    	; 0x8c <__bad_interrupt>
+   6:	42 c0       	rjmp	.+132    	; 0x8c <__bad_interrupt>
+   8:	41 c0       	rjmp	.+130    	; 0x8c <__bad_interrupt>
+   a:	40 c0       	rjmp	.+128    	; 0x8c <__bad_interrupt>
+   c:	3f c0       	rjmp	.+126    	; 0x8c <__bad_interrupt>
+   e:	3e c0       	rjmp	.+124    	; 0x8c <__bad_interrupt>
+  10:	3d c0       	rjmp	.+122    	; 0x8c <__bad_interrupt>
+  12:	3c c0       	rjmp	.+120    	; 0x8c <__bad_interrupt>
+  14:	3b c0       	rjmp	.+118    	; 0x8c <__bad_interrupt>
+  16:	6a c1       	rjmp	.+724    	; 0x2ec <__vector_11>
+  18:	39 c0       	rjmp	.+114    	; 0x8c <__bad_interrupt>
+  1a:	38 c0       	rjmp	.+112    	; 0x8c <__bad_interrupt>
+  1c:	37 c0       	rjmp	.+110    	; 0x8c <__bad_interrupt>
+  1e:	36 c0       	rjmp	.+108    	; 0x8c <__bad_interrupt>
+  20:	35 c0       	rjmp	.+106    	; 0x8c <__bad_interrupt>
+  22:	34 c0       	rjmp	.+104    	; 0x8c <__bad_interrupt>
+  24:	33 c0       	rjmp	.+102    	; 0x8c <__bad_interrupt>
+  26:	08 c1       	rjmp	.+528    	; 0x238 <set_pin_inv+0x10>
+  28:	09 c1       	rjmp	.+530    	; 0x23c <set_pin_inv+0x14>
+  2a:	0a c1       	rjmp	.+532    	; 0x240 <set_pin_inv+0x18>
+  2c:	0b c1       	rjmp	.+534    	; 0x244 <set_pin_inv+0x1c>
+  2e:	0c c1       	rjmp	.+536    	; 0x248 <set_pin_inv+0x20>
+  30:	0d c1       	rjmp	.+538    	; 0x24c <set_pin_inv+0x24>
+  32:	0e c1       	rjmp	.+540    	; 0x250 <set_pin_inv+0x28>
+  34:	0f c1       	rjmp	.+542    	; 0x254 <set_pin_inv+0x2c>
+  36:	18 c1       	rjmp	.+560    	; 0x268 <clear_pin_inv+0x10>
+  38:	19 c1       	rjmp	.+562    	; 0x26c <clear_pin_inv+0x14>
+  3a:	1a c1       	rjmp	.+564    	; 0x270 <clear_pin_inv+0x18>
+  3c:	1b c1       	rjmp	.+566    	; 0x274 <clear_pin_inv+0x1c>
+  3e:	1c c1       	rjmp	.+568    	; 0x278 <clear_pin_inv+0x20>
+  40:	1d c1       	rjmp	.+570    	; 0x27c <clear_pin_inv+0x24>
+  42:	1e c1       	rjmp	.+572    	; 0x280 <clear_pin_inv+0x28>
+  44:	1f c1       	rjmp	.+574    	; 0x284 <clear_pin_inv+0x2c>
+  46:	22 c2       	rjmp	.+1092   	; 0x48c <__stack+0x2d>
+  48:	26 c2       	rjmp	.+1100   	; 0x496 <__stack+0x37>
+  4a:	2a c2       	rjmp	.+1108   	; 0x4a0 <__stack+0x41>
+  4c:	2e c2       	rjmp	.+1116   	; 0x4aa <__stack+0x4b>
+  4e:	32 c2       	rjmp	.+1124   	; 0x4b4 <__stack+0x55>
+  50:	36 c2       	rjmp	.+1132   	; 0x4be <__stack+0x5f>
+  52:	3a c2       	rjmp	.+1140   	; 0x4c8 <__stack+0x69>
+  54:	3e c2       	rjmp	.+1148   	; 0x4d2 <__stack+0x73>
+
+00000056 <__ctors_end>:
+  56:	11 24       	eor	r1, r1
+  58:	1f be       	out	0x3f, r1	; 63
+  5a:	cf e5       	ldi	r28, 0x5F	; 95
+  5c:	d4 e0       	ldi	r29, 0x04	; 4
+  5e:	de bf       	out	0x3e, r29	; 62
+  60:	cd bf       	out	0x3d, r28	; 61
+
+00000062 <__do_copy_data>:
+  62:	11 e0       	ldi	r17, 0x01	; 1
+  64:	a0 e6       	ldi	r26, 0x60	; 96
+  66:	b0 e0       	ldi	r27, 0x00	; 0
+  68:	ee e8       	ldi	r30, 0x8E	; 142
+  6a:	fa e0       	ldi	r31, 0x0A	; 10
+  6c:	02 c0       	rjmp	.+4      	; 0x72 <__do_copy_data+0x10>
+  6e:	05 90       	lpm	r0, Z+
+  70:	0d 92       	st	X+, r0
+  72:	a8 37       	cpi	r26, 0x78	; 120
+  74:	b1 07       	cpc	r27, r17
+  76:	d9 f7       	brne	.-10     	; 0x6e <__do_copy_data+0xc>
+
+00000078 <__do_clear_bss>:
+  78:	21 e0       	ldi	r18, 0x01	; 1
+  7a:	a8 e7       	ldi	r26, 0x78	; 120
+  7c:	b1 e0       	ldi	r27, 0x01	; 1
+  7e:	01 c0       	rjmp	.+2      	; 0x82 <.do_clear_bss_start>
+
+00000080 <.do_clear_bss_loop>:
+  80:	1d 92       	st	X+, r1
+
+00000082 <.do_clear_bss_start>:
+  82:	a8 38       	cpi	r26, 0x88	; 136
+  84:	b2 07       	cpc	r27, r18
+  86:	e1 f7       	brne	.-8      	; 0x80 <.do_clear_bss_loop>
+  88:	80 d3       	rcall	.+1792   	; 0x78a <main>
+  8a:	ff c4       	rjmp	.+2558   	; 0xa8a <_exit>
+
+0000008c <__bad_interrupt>:
+  8c:	b9 cf       	rjmp	.-142    	; 0x0 <__vectors>
+
+0000008e <TWI_READ_BULK>:
+		return Returnval;	
+
+}
+
+
+uint8_t TWI_READ_BULK(uint8_t ICAddr, uint8_t Offset, uint8_t Length, uint8_t (*Readout)[]){
+  8e:	f9 01       	movw	r30, r18
+		
+		//uint8_t Returnval = 0;
+		
+		TWSR=0;					//prescaler = 1 = (4^0)
+  90:	11 b8       	out	0x01, r1	; 1
+		TWBR=TW_Bautrate;
+  92:	9c e0       	ldi	r25, 0x0C	; 12
+  94:	90 b9       	out	0x00, r25	; 0
+		
+		//STOP
+		TWCR=TWCR_STOP;
+  96:	94 e9       	ldi	r25, 0x94	; 148
+  98:	96 bf       	out	0x36, r25	; 54
+
+		
+		/****Start ****/
+		TWCR=TWCR_START;
+  9a:	94 ea       	ldi	r25, 0xA4	; 164
+  9c:	96 bf       	out	0x36, r25	; 54
+		while (!(TWCR & (1<<TWINT)))
+  9e:	06 b6       	in	r0, 0x36	; 54
+  a0:	07 fe       	sbrs	r0, 7
+  a2:	fd cf       	rjmp	.-6      	; 0x9e <TWI_READ_BULK+0x10>
+		{
+			//warten bis interupt-flag gesetzt ist
+		}
+		if (TW_STATUS!=TW_START)
+  a4:	91 b1       	in	r25, 0x01	; 1
+  a6:	98 7f       	andi	r25, 0xF8	; 248
+  a8:	98 30       	cpi	r25, 0x08	; 8
+  aa:	21 f0       	breq	.+8      	; 0xb4 <TWI_READ_BULK+0x26>
+		return 0;
+}
+
+void TWI_ERROR(void){
+	
+		TWCR=TWCR_STOP;
+  ac:	84 e9       	ldi	r24, 0x94	; 148
+  ae:	86 bf       	out	0x36, r24	; 54
+			//warten bis interupt-flag gesetzt ist
+		}
+		if (TW_STATUS!=TW_START)
+		{
+			TWI_ERROR();
+			return 0;
+  b0:	80 e0       	ldi	r24, 0x00	; 0
+  b2:	08 95       	ret
+
+		
+
+
+		/****Adresse ****/
+		TWDR=	ICAddr | TW_WRITE;					//Adresse _ peudo write
+  b4:	83 b9       	out	0x03, r24	; 3
+		TWCR=TWCR_SEND;
+  b6:	94 e8       	ldi	r25, 0x84	; 132
+  b8:	96 bf       	out	0x36, r25	; 54
+		while (!(TWCR & (1<<TWINT)))
+  ba:	06 b6       	in	r0, 0x36	; 54
+  bc:	07 fe       	sbrs	r0, 7
+  be:	fd cf       	rjmp	.-6      	; 0xba <TWI_READ_BULK+0x2c>
+		{
+			//warten bis interupt-flag gesetzt ist
+		}
+		if (TW_STATUS!=TW_MT_SLA_ACK)
+  c0:	91 b1       	in	r25, 0x01	; 1
+  c2:	98 7f       	andi	r25, 0xF8	; 248
+  c4:	98 31       	cpi	r25, 0x18	; 24
+  c6:	21 f0       	breq	.+8      	; 0xd0 <TWI_READ_BULK+0x42>
+		return 0;
+}
+
+void TWI_ERROR(void){
+	
+		TWCR=TWCR_STOP;
+  c8:	84 e9       	ldi	r24, 0x94	; 148
+  ca:	86 bf       	out	0x36, r24	; 54
+			//warten bis interupt-flag gesetzt ist
+		}
+		if (TW_STATUS!=TW_MT_SLA_ACK)
+		{
+			TWI_ERROR();
+			return 0;
+  cc:	80 e0       	ldi	r24, 0x00	; 0
+  ce:	08 95       	ret
+		}
+		
+		
+		/****Auswahl Register + auto increment=0****/
+		TWDR=Offset;
+  d0:	63 b9       	out	0x03, r22	; 3
+		TWCR=TWCR_SEND;
+  d2:	94 e8       	ldi	r25, 0x84	; 132
+  d4:	96 bf       	out	0x36, r25	; 54
+		while (!(TWCR & (1<<TWINT)))
+  d6:	06 b6       	in	r0, 0x36	; 54
+  d8:	07 fe       	sbrs	r0, 7
+  da:	fd cf       	rjmp	.-6      	; 0xd6 <TWI_READ_BULK+0x48>
+		{
+			//warten bis interupt-flag gesetzt ist
+		}
+		//Ueberpruefen, ob Daten angekommen sind
+		if (TW_STATUS!=TW_MT_DATA_ACK)
+  dc:	91 b1       	in	r25, 0x01	; 1
+  de:	98 7f       	andi	r25, 0xF8	; 248
+  e0:	98 32       	cpi	r25, 0x28	; 40
+  e2:	21 f0       	breq	.+8      	; 0xec <TWI_READ_BULK+0x5e>
+		return 0;
+}
+
+void TWI_ERROR(void){
+	
+		TWCR=TWCR_STOP;
+  e4:	84 e9       	ldi	r24, 0x94	; 148
+  e6:	86 bf       	out	0x36, r24	; 54
+		}
+		//Ueberpruefen, ob Daten angekommen sind
+		if (TW_STATUS!=TW_MT_DATA_ACK)
+		{
+			TWI_ERROR();
+			return 0;
+  e8:	80 e0       	ldi	r24, 0x00	; 0
+  ea:	08 95       	ret
+		}
+		
+		TWCR=TWCR_RESTART;
+  ec:	94 ee       	ldi	r25, 0xE4	; 228
+  ee:	96 bf       	out	0x36, r25	; 54
+		while (!(TWCR & (1<<TWINT)))
+  f0:	06 b6       	in	r0, 0x36	; 54
+  f2:	07 fe       	sbrs	r0, 7
+  f4:	fd cf       	rjmp	.-6      	; 0xf0 <TWI_READ_BULK+0x62>
+		{
+			//warten bis interupt-flag gesetzt ist
+		}
+		if (TW_STATUS!=TW_REP_START)
+  f6:	91 b1       	in	r25, 0x01	; 1
+  f8:	98 7f       	andi	r25, 0xF8	; 248
+  fa:	90 31       	cpi	r25, 0x10	; 16
+  fc:	21 f0       	breq	.+8      	; 0x106 <TWI_READ_BULK+0x78>
+		return 0;
+}
+
+void TWI_ERROR(void){
+	
+		TWCR=TWCR_STOP;
+  fe:	84 e9       	ldi	r24, 0x94	; 148
+ 100:	86 bf       	out	0x36, r24	; 54
+			//warten bis interupt-flag gesetzt ist
+		}
+		if (TW_STATUS!=TW_REP_START)
+		{
+			TWI_ERROR();
+			return 0;
+ 102:	80 e0       	ldi	r24, 0x00	; 0
+ 104:	08 95       	ret
+		}
+		
+		/****Übertragen Wert****/
+		TWDR=	ICAddr | TW_READ;					//Adresse _ peudo write
+ 106:	81 60       	ori	r24, 0x01	; 1
+ 108:	83 b9       	out	0x03, r24	; 3
+		TWCR=TWCR_SEND;//VON THOMAS .. VORHER TWCR_GET
+ 10a:	84 e8       	ldi	r24, 0x84	; 132
+ 10c:	86 bf       	out	0x36, r24	; 54
+		while (!(TWCR & (1<<TWINT)))
+ 10e:	06 b6       	in	r0, 0x36	; 54
+ 110:	07 fe       	sbrs	r0, 7
+ 112:	fd cf       	rjmp	.-6      	; 0x10e <TWI_READ_BULK+0x80>
+		{
+			//warten bis interupt-flag gesetzt ist
+		}
+		//Ueberpruefen, ob Daten angekommen sind
+		if (TW_STATUS!=TW_MR_SLA_ACK)
+ 114:	81 b1       	in	r24, 0x01	; 1
+ 116:	88 7f       	andi	r24, 0xF8	; 248
+ 118:	80 34       	cpi	r24, 0x40	; 64
+ 11a:	41 f4       	brne	.+16     	; 0x12c <TWI_READ_BULK+0x9e>
+			return 0;
+		}
+	
+		uint8_t i = 0;
+		
+		for (i=0;i<Length-1;i++){
+ 11c:	64 2f       	mov	r22, r20
+ 11e:	70 e0       	ldi	r23, 0x00	; 0
+ 120:	61 50       	subi	r22, 0x01	; 1
+ 122:	71 09       	sbc	r23, r1
+ 124:	16 16       	cp	r1, r22
+ 126:	17 06       	cpc	r1, r23
+ 128:	2c f0       	brlt	.+10     	; 0x134 <TWI_READ_BULK+0xa6>
+ 12a:	23 c0       	rjmp	.+70     	; 0x172 <TWI_READ_BULK+0xe4>
+		return 0;
+}
+
+void TWI_ERROR(void){
+	
+		TWCR=TWCR_STOP;
+ 12c:	84 e9       	ldi	r24, 0x94	; 148
+ 12e:	86 bf       	out	0x36, r24	; 54
+		}
+		//Ueberpruefen, ob Daten angekommen sind
+		if (TW_STATUS!=TW_MR_SLA_ACK)
+		{
+			TWI_ERROR();
+			return 0;
+ 130:	80 e0       	ldi	r24, 0x00	; 0
+ 132:	08 95       	ret
+		}
+	
+		uint8_t i = 0;
+		
+		for (i=0;i<Length-1;i++){
+ 134:	80 e0       	ldi	r24, 0x00	; 0
+ 136:	90 e0       	ldi	r25, 0x00	; 0
+ 138:	40 e0       	ldi	r20, 0x00	; 0
+		
+			TWCR=TWCR_GET;
+ 13a:	54 ec       	ldi	r21, 0xC4	; 196
+ 13c:	56 bf       	out	0x36, r21	; 54
+			while (!(TWCR & (1<<TWINT)))
+ 13e:	06 b6       	in	r0, 0x36	; 54
+ 140:	07 fe       	sbrs	r0, 7
+ 142:	fd cf       	rjmp	.-6      	; 0x13e <TWI_READ_BULK+0xb0>
+			{
+				//warten bis interupt-flag gesetzt ist
+			}
+			//Ueberpruefen, ob Daten angekommen sind
+			if (TW_STATUS!=TW_MR_DATA_ACK)
+ 144:	31 b1       	in	r19, 0x01	; 1
+ 146:	38 7f       	andi	r19, 0xF8	; 248
+ 148:	30 35       	cpi	r19, 0x50	; 80
+ 14a:	21 f0       	breq	.+8      	; 0x154 <TWI_READ_BULK+0xc6>
+		return 0;
+}
+
+void TWI_ERROR(void){
+	
+		TWCR=TWCR_STOP;
+ 14c:	84 e9       	ldi	r24, 0x94	; 148
+ 14e:	86 bf       	out	0x36, r24	; 54
+			}
+			//Ueberpruefen, ob Daten angekommen sind
+			if (TW_STATUS!=TW_MR_DATA_ACK)
+			{
+				TWI_ERROR();
+				return 0;
+ 150:	80 e0       	ldi	r24, 0x00	; 0
+ 152:	08 95       	ret
+			}		
+		
+			(*Readout)[i] = TWDR;
+ 154:	23 b1       	in	r18, 0x03	; 3
+ 156:	df 01       	movw	r26, r30
+ 158:	a8 0f       	add	r26, r24
+ 15a:	b9 1f       	adc	r27, r25
+ 15c:	2c 93       	st	X, r18
+ 15e:	84 e1       	ldi	r24, 0x14	; 20
+			
+			uint8_t j=0;
+			for (j=0;j<20;j++)
+			{
+					__asm__ volatile ("nop");
+ 160:	00 00       	nop
+ 162:	81 50       	subi	r24, 0x01	; 1
+			}		
+		
+			(*Readout)[i] = TWDR;
+			
+			uint8_t j=0;
+			for (j=0;j<20;j++)
+ 164:	e9 f7       	brne	.-6      	; 0x160 <TWI_READ_BULK+0xd2>
+			return 0;
+		}
+	
+		uint8_t i = 0;
+		
+		for (i=0;i<Length-1;i++){
+ 166:	4f 5f       	subi	r20, 0xFF	; 255
+ 168:	84 2f       	mov	r24, r20
+ 16a:	90 e0       	ldi	r25, 0x00	; 0
+ 16c:	86 17       	cp	r24, r22
+ 16e:	97 07       	cpc	r25, r23
+ 170:	2c f3       	brlt	.-54     	; 0x13c <TWI_READ_BULK+0xae>
+			
+			
+		}
+		
+		// ENDE
+		TWCR=TWCR_SEND;
+ 172:	84 e8       	ldi	r24, 0x84	; 132
+ 174:	86 bf       	out	0x36, r24	; 54
+
+		
+		while (!(TWCR & (1<<TWINT)))
+ 176:	06 b6       	in	r0, 0x36	; 54
+ 178:	07 fe       	sbrs	r0, 7
+ 17a:	fd cf       	rjmp	.-6      	; 0x176 <TWI_READ_BULK+0xe8>
+		{
+			//warten bis interupt-flag gesetzt ist
+		}
+
+		(*Readout)[Length-1] = TWDR;		
+ 17c:	83 b1       	in	r24, 0x03	; 3
+ 17e:	e6 0f       	add	r30, r22
+ 180:	f7 1f       	adc	r31, r23
+ 182:	80 83       	st	Z, r24
+		//STOP
+		TWCR=TWCR_STOP;
+ 184:	84 e9       	ldi	r24, 0x94	; 148
+ 186:	86 bf       	out	0x36, r24	; 54
+
+		return 1;
+ 188:	81 e0       	ldi	r24, 0x01	; 1
+	
+}
+ 18a:	08 95       	ret
+
+0000018c <TWI_WRITE_BULK>:
+
+uint8_t TWI_WRITE_BULK(uint8_t ICAddr, uint8_t Offset, uint8_t Length, uint8_t (*Filldata)[]){
+			
+	//	uint8_t Returnval = 0;
+		
+		TWSR=0;					//prescaler = 1 = (4^0)
+ 18c:	11 b8       	out	0x01, r1	; 1
+		TWBR=TW_Bautrate;
+ 18e:	9c e0       	ldi	r25, 0x0C	; 12
+ 190:	90 b9       	out	0x00, r25	; 0
+		
+		//STOP
+		TWCR=TWCR_STOP;
+ 192:	94 e9       	ldi	r25, 0x94	; 148
+ 194:	96 bf       	out	0x36, r25	; 54
+
+		
+		/****Start ****/
+		TWCR=TWCR_START;
+ 196:	94 ea       	ldi	r25, 0xA4	; 164
+ 198:	96 bf       	out	0x36, r25	; 54
+		while (!(TWCR & (1<<TWINT)))
+ 19a:	06 b6       	in	r0, 0x36	; 54
+ 19c:	07 fe       	sbrs	r0, 7
+ 19e:	fd cf       	rjmp	.-6      	; 0x19a <TWI_WRITE_BULK+0xe>
+		{
+			//warten bis interupt-flag gesetzt ist
+		}
+		if (TW_STATUS!=TW_START)
+ 1a0:	91 b1       	in	r25, 0x01	; 1
+ 1a2:	98 7f       	andi	r25, 0xF8	; 248
+ 1a4:	98 30       	cpi	r25, 0x08	; 8
+ 1a6:	21 f0       	breq	.+8      	; 0x1b0 <TWI_WRITE_BULK+0x24>
+		return 0;
+}
+
+void TWI_ERROR(void){
+	
+		TWCR=TWCR_STOP;
+ 1a8:	84 e9       	ldi	r24, 0x94	; 148
+ 1aa:	86 bf       	out	0x36, r24	; 54
+			//warten bis interupt-flag gesetzt ist
+		}
+		if (TW_STATUS!=TW_START)
+		{
+			TWI_ERROR();
+			return 0;
+ 1ac:	80 e0       	ldi	r24, 0x00	; 0
+ 1ae:	08 95       	ret
+
+		
+
+
+		/****Adresse ****/
+		TWDR=	ICAddr | TW_WRITE;					//Adresse  write
+ 1b0:	83 b9       	out	0x03, r24	; 3
+		TWCR=TWCR_SEND;
+ 1b2:	84 e8       	ldi	r24, 0x84	; 132
+ 1b4:	86 bf       	out	0x36, r24	; 54
+		while (!(TWCR & (1<<TWINT)))
+ 1b6:	06 b6       	in	r0, 0x36	; 54
+ 1b8:	07 fe       	sbrs	r0, 7
+ 1ba:	fd cf       	rjmp	.-6      	; 0x1b6 <TWI_WRITE_BULK+0x2a>
+		{
+			//warten bis interupt-flag gesetzt ist
+		}
+		if (TW_STATUS!=TW_MT_SLA_ACK)
+ 1bc:	81 b1       	in	r24, 0x01	; 1
+ 1be:	88 7f       	andi	r24, 0xF8	; 248
+ 1c0:	88 31       	cpi	r24, 0x18	; 24
+ 1c2:	21 f0       	breq	.+8      	; 0x1cc <TWI_WRITE_BULK+0x40>
+		return 0;
+}
+
+void TWI_ERROR(void){
+	
+		TWCR=TWCR_STOP;
+ 1c4:	84 e9       	ldi	r24, 0x94	; 148
+ 1c6:	86 bf       	out	0x36, r24	; 54
+			//warten bis interupt-flag gesetzt ist
+		}
+		if (TW_STATUS!=TW_MT_SLA_ACK)
+		{
+			TWI_ERROR();
+			return 0;
+ 1c8:	80 e0       	ldi	r24, 0x00	; 0
+ 1ca:	08 95       	ret
+		}
+		
+		
+		/****Auswahl Register + auto increment=0****/
+		TWDR=Offset;
+ 1cc:	63 b9       	out	0x03, r22	; 3
+		TWCR=TWCR_SEND;
+ 1ce:	84 e8       	ldi	r24, 0x84	; 132
+ 1d0:	86 bf       	out	0x36, r24	; 54
+		while (!(TWCR & (1<<TWINT)))
+ 1d2:	06 b6       	in	r0, 0x36	; 54
+ 1d4:	07 fe       	sbrs	r0, 7
+ 1d6:	fd cf       	rjmp	.-6      	; 0x1d2 <TWI_WRITE_BULK+0x46>
+		{
+			//warten bis interupt-flag gesetzt ist
+		}
+		//Ueberpruefen, ob Daten angekommen sind
+		if (TW_STATUS!=TW_MT_DATA_ACK)
+ 1d8:	81 b1       	in	r24, 0x01	; 1
+ 1da:	88 7f       	andi	r24, 0xF8	; 248
+ 1dc:	88 32       	cpi	r24, 0x28	; 40
+ 1de:	19 f4       	brne	.+6      	; 0x1e6 <TWI_WRITE_BULK+0x5a>
+		}
+		
+		
+		uint8_t i = 0;
+		
+		for (i=0;i<Length;i++){
+ 1e0:	41 11       	cpse	r20, r1
+ 1e2:	05 c0       	rjmp	.+10     	; 0x1ee <TWI_WRITE_BULK+0x62>
+ 1e4:	1d c0       	rjmp	.+58     	; 0x220 <__EEPROM_REGION_LENGTH__+0x20>
+		return 0;
+}
+
+void TWI_ERROR(void){
+	
+		TWCR=TWCR_STOP;
+ 1e6:	84 e9       	ldi	r24, 0x94	; 148
+ 1e8:	86 bf       	out	0x36, r24	; 54
+		}
+		//Ueberpruefen, ob Daten angekommen sind
+		if (TW_STATUS!=TW_MT_DATA_ACK)
+		{
+			TWI_ERROR();
+			return 0;
+ 1ea:	80 e0       	ldi	r24, 0x00	; 0
+ 1ec:	08 95       	ret
+ 1ee:	f9 01       	movw	r30, r18
+ 1f0:	41 50       	subi	r20, 0x01	; 1
+ 1f2:	84 2f       	mov	r24, r20
+ 1f4:	90 e0       	ldi	r25, 0x00	; 0
+ 1f6:	01 96       	adiw	r24, 0x01	; 1
+ 1f8:	28 0f       	add	r18, r24
+ 1fa:	39 1f       	adc	r19, r25
+		uint8_t i = 0;
+		
+		for (i=0;i<Length;i++){
+			/****Übertragen Wert****/
+			TWDR = (*Filldata)[i];
+			TWCR=TWCR_SEND;
+ 1fc:	94 e8       	ldi	r25, 0x84	; 132
+		
+		uint8_t i = 0;
+		
+		for (i=0;i<Length;i++){
+			/****Übertragen Wert****/
+			TWDR = (*Filldata)[i];
+ 1fe:	81 91       	ld	r24, Z+
+ 200:	83 b9       	out	0x03, r24	; 3
+			TWCR=TWCR_SEND;
+ 202:	96 bf       	out	0x36, r25	; 54
+			while (!(TWCR & (1<<TWINT)))
+ 204:	06 b6       	in	r0, 0x36	; 54
+ 206:	07 fe       	sbrs	r0, 7
+ 208:	fd cf       	rjmp	.-6      	; 0x204 <__EEPROM_REGION_LENGTH__+0x4>
+			{
+				//warten bis interupt-flag gesetzt ist
+			}
+			//Ueberpruefen, ob Daten angekommen sind
+			if (TW_STATUS!=TW_MT_DATA_ACK)
+ 20a:	81 b1       	in	r24, 0x01	; 1
+ 20c:	88 7f       	andi	r24, 0xF8	; 248
+ 20e:	88 32       	cpi	r24, 0x28	; 40
+ 210:	21 f0       	breq	.+8      	; 0x21a <__EEPROM_REGION_LENGTH__+0x1a>
+		return 0;
+}
+
+void TWI_ERROR(void){
+	
+		TWCR=TWCR_STOP;
+ 212:	84 e9       	ldi	r24, 0x94	; 148
+ 214:	86 bf       	out	0x36, r24	; 54
+			}
+			//Ueberpruefen, ob Daten angekommen sind
+			if (TW_STATUS!=TW_MT_DATA_ACK)
+			{
+				TWI_ERROR();
+				return 0;
+ 216:	80 e0       	ldi	r24, 0x00	; 0
+ 218:	08 95       	ret
+		}
+		
+		
+		uint8_t i = 0;
+		
+		for (i=0;i<Length;i++){
+ 21a:	e2 17       	cp	r30, r18
+ 21c:	f3 07       	cpc	r31, r19
+ 21e:	79 f7       	brne	.-34     	; 0x1fe <TWI_WRITE_BULK+0x72>
+			
+		}
+		
+	
+		//STOP
+		TWCR=TWCR_STOP;
+ 220:	84 e9       	ldi	r24, 0x94	; 148
+ 222:	86 bf       	out	0x36, r24	; 54
+
+		return 1;
+ 224:	81 e0       	ldi	r24, 0x01	; 1
+	
+	
+	
+		return 0;
+}
+ 226:	08 95       	ret
+
+00000228 <set_pin_inv>:
+//}
+
+
+void set_pin_inv(uint8_t pinnr){
+	//inverted cos of 74HC1G14 inverter
+	switch(pinnr){
+ 228:	90 e0       	ldi	r25, 0x00	; 0
+ 22a:	88 30       	cpi	r24, 0x08	; 8
+ 22c:	91 05       	cpc	r25, r1
+ 22e:	98 f4       	brcc	.+38     	; 0x256 <set_pin_inv+0x2e>
+ 230:	fc 01       	movw	r30, r24
+ 232:	ed 5e       	subi	r30, 0xED	; 237
+ 234:	ff 4f       	sbci	r31, 0xFF	; 255
+ 236:	09 94       	ijmp
+		case 0: PORTB &= 0xFE;
+ 238:	c0 98       	cbi	0x18, 0	; 24
+		break;
+ 23a:	08 95       	ret
+		case 1: PORTD &= 0xFD;
+ 23c:	91 98       	cbi	0x12, 1	; 18
+		break;
+ 23e:	08 95       	ret
+		case 2: PORTD &= 0xFB;
+ 240:	92 98       	cbi	0x12, 2	; 18
+		break;
+ 242:	08 95       	ret
+		case 3: PORTD &= 0xF7;
+ 244:	93 98       	cbi	0x12, 3	; 18
+		break;
+ 246:	08 95       	ret
+		case 4: PORTD &= 0xEF;
+ 248:	94 98       	cbi	0x12, 4	; 18
+		break;
+ 24a:	08 95       	ret
+		case 5: PORTD &= 0xDF;
+ 24c:	95 98       	cbi	0x12, 5	; 18
+		break;
+ 24e:	08 95       	ret
+		case 6: PORTD &= 0xBF;
+ 250:	96 98       	cbi	0x12, 6	; 18
+		break;
+ 252:	08 95       	ret
+		case 7: PORTD &= 0x7F;
+ 254:	97 98       	cbi	0x12, 7	; 18
+ 256:	08 95       	ret
+
+00000258 <clear_pin_inv>:
+	
+	return;
+}
+
+void clear_pin_inv(uint8_t pinnr){
+	switch(pinnr){
+ 258:	90 e0       	ldi	r25, 0x00	; 0
+ 25a:	88 30       	cpi	r24, 0x08	; 8
+ 25c:	91 05       	cpc	r25, r1
+ 25e:	98 f4       	brcc	.+38     	; 0x286 <clear_pin_inv+0x2e>
+ 260:	fc 01       	movw	r30, r24
+ 262:	e5 5e       	subi	r30, 0xE5	; 229
+ 264:	ff 4f       	sbci	r31, 0xFF	; 255
+ 266:	09 94       	ijmp
+		case 0: PORTB |= 0x01;
+ 268:	c0 9a       	sbi	0x18, 0	; 24
+		break;
+ 26a:	08 95       	ret
+		case 1: PORTD |= 0x02;
+ 26c:	91 9a       	sbi	0x12, 1	; 18
+		break;
+ 26e:	08 95       	ret
+		case 2: PORTD |= 0x04;
+ 270:	92 9a       	sbi	0x12, 2	; 18
+		break;
+ 272:	08 95       	ret
+		case 3: PORTD |= 0x08;
+ 274:	93 9a       	sbi	0x12, 3	; 18
+		break;
+ 276:	08 95       	ret
+		case 4: PORTD |= 0x10;
+ 278:	94 9a       	sbi	0x12, 4	; 18
+		break;
+ 27a:	08 95       	ret
+		case 5: PORTD |= 0x20;
+ 27c:	95 9a       	sbi	0x12, 5	; 18
+		break;
+ 27e:	08 95       	ret
+		case 6: PORTD |= 0x40;
+ 280:	96 9a       	sbi	0x12, 6	; 18
+		break;
+ 282:	08 95       	ret
+		case 7: PORTD |= 0x80;
+ 284:	97 9a       	sbi	0x12, 7	; 18
+ 286:	08 95       	ret
+
+00000288 <set_default>:
+
+/************************************************************************/
+
+void set_default(void){
+	//MIDI
+	midi_channel = 9;
+ 288:	89 e0       	ldi	r24, 0x09	; 9
+ 28a:	80 93 67 00 	sts	0x0067, r24	; 0x800067 <midi_channel>
+	module_mode = MODE_VELOCITY;
+ 28e:	81 e0       	ldi	r24, 0x01	; 1
+ 290:	80 93 66 00 	sts	0x0066, r24	; 0x800066 <module_mode>
+	memcpy(&midi_note_map,&midi_note_map_default,8);
+ 294:	88 e0       	ldi	r24, 0x08	; 8
+ 296:	e8 e6       	ldi	r30, 0x68	; 104
+ 298:	f0 e0       	ldi	r31, 0x00	; 0
+ 29a:	a0 e7       	ldi	r26, 0x70	; 112
+ 29c:	b0 e0       	ldi	r27, 0x00	; 0
+ 29e:	01 90       	ld	r0, Z+
+ 2a0:	0d 92       	st	X+, r0
+ 2a2:	8a 95       	dec	r24
+ 2a4:	e1 f7       	brne	.-8      	; 0x29e <set_default+0x16>
+	//presets.reset_invert = DISABLE;
+	//presets.velocity_mute = DISABLE;
+	//presets.midi_conv_en = ENABLE;
+	
+	//SAVE TO EEPROM
+	do {} while (!eeprom_is_ready());
+ 2a6:	e1 99       	sbic	0x1c, 1	; 28
+ 2a8:	fe cf       	rjmp	.-4      	; 0x2a6 <set_default+0x1e>
+	//save Channel
+	//midi_channel = eeprom_read_byte(EEPROM_CHANNEL_ADDR);
+	eeprom_write_byte(EEPROM_CHANNEL_ADDR,midi_channel);
+ 2aa:	69 e0       	ldi	r22, 0x09	; 9
+ 2ac:	80 e0       	ldi	r24, 0x00	; 0
+ 2ae:	91 e0       	ldi	r25, 0x01	; 1
+ 2b0:	df d3       	rcall	.+1982   	; 0xa70 <eeprom_write_byte>
+	
+	do {} while (!eeprom_is_ready());/*				SET DEFAULTS                                            */
+ 2b2:	e1 99       	sbic	0x1c, 1	; 28
+ 2b4:	fe cf       	rjmp	.-4      	; 0x2b2 <set_default+0x2a>
+/************************************************************************/
+
+
+	//load map
+	//	eeprom_read_block(&midi_note_map,EEPROM_MAP_ADDR,8);
+	eeprom_write_block(&midi_note_map,EEPROM_MAP_ADDR,8);
+ 2b6:	48 e0       	ldi	r20, 0x08	; 8
+ 2b8:	50 e0       	ldi	r21, 0x00	; 0
+ 2ba:	61 e0       	ldi	r22, 0x01	; 1
+ 2bc:	71 e0       	ldi	r23, 0x01	; 1
+ 2be:	80 e7       	ldi	r24, 0x70	; 112
+ 2c0:	90 e0       	ldi	r25, 0x00	; 0
+ 2c2:	cd d3       	rcall	.+1946   	; 0xa5e <eeprom_write_block>
+	
+	//SAVE TO EEPROM
+	do {} while (!eeprom_is_ready());
+ 2c4:	e1 99       	sbic	0x1c, 1	; 28
+ 2c6:	fe cf       	rjmp	.-4      	; 0x2c4 <set_default+0x3c>
+	//save Channel
+	//midi_channel = eeprom_read_byte(EEPROM_CHANNEL_ADDR);
+	eeprom_write_byte(EEPROM_MODE_ADDR,module_mode);	
+ 2c8:	60 91 66 00 	lds	r22, 0x0066	; 0x800066 <module_mode>
+ 2cc:	80 e1       	ldi	r24, 0x10	; 16
+ 2ce:	91 e0       	ldi	r25, 0x01	; 1
+ 2d0:	cf d3       	rcall	.+1950   	; 0xa70 <eeprom_write_byte>
+ 2d2:	08 95       	ret
+
+000002d4 <set_velocity>:
+
+void set_velocity(uint8_t ch, uint8_t velo){
+	
+	velo = velo & 0x7F; 
+	
+	max5825_set_load_channel((ch&0x0F),velocity_lookup[velo]);
+ 2d4:	6f 77       	andi	r22, 0x7F	; 127
+ 2d6:	e6 2f       	mov	r30, r22
+ 2d8:	f0 e0       	ldi	r31, 0x00	; 0
+ 2da:	ee 0f       	add	r30, r30
+ 2dc:	ff 1f       	adc	r31, r31
+ 2de:	e8 58       	subi	r30, 0x88	; 136
+ 2e0:	ff 4f       	sbci	r31, 0xFF	; 255
+ 2e2:	60 81       	ld	r22, Z
+ 2e4:	71 81       	ldd	r23, Z+1	; 0x01
+ 2e6:	8f 70       	andi	r24, 0x0F	; 15
+ 2e8:	8c d3       	rcall	.+1816   	; 0xa02 <max5825_set_load_channel>
+ 2ea:	08 95       	ret
+
+000002ec <__vector_11>:
+}
+
+
+/* MIDI RECEIVER */
+ISR(USART_RXC_vect)
+{
+ 2ec:	1f 92       	push	r1
+ 2ee:	0f 92       	push	r0
+ 2f0:	0f b6       	in	r0, 0x3f	; 63
+ 2f2:	0f 92       	push	r0
+ 2f4:	11 24       	eor	r1, r1
+ 2f6:	ef 92       	push	r14
+ 2f8:	ff 92       	push	r15
+ 2fa:	0f 93       	push	r16
+ 2fc:	1f 93       	push	r17
+ 2fe:	2f 93       	push	r18
+ 300:	3f 93       	push	r19
+ 302:	4f 93       	push	r20
+ 304:	5f 93       	push	r21
+ 306:	6f 93       	push	r22
+ 308:	7f 93       	push	r23
+ 30a:	8f 93       	push	r24
+ 30c:	9f 93       	push	r25
+ 30e:	af 93       	push	r26
+ 310:	bf 93       	push	r27
+ 312:	cf 93       	push	r28
+ 314:	df 93       	push	r29
+ 316:	ef 93       	push	r30
+ 318:	ff 93       	push	r31
+	uint8_t uart_data;
+	uart_data = UDR;
+ 31a:	8c b1       	in	r24, 0x0c	; 12
+	
+	
+	//set_LED(ENABLE);
+	
+	if ((uart_data>>MIDI_STATUS_bit)&1)
+ 31c:	88 23       	and	r24, r24
+ 31e:	04 f5       	brge	.+64     	; 0x360 <__vector_11+0x74>
+	{
+		if((uart_data & 0xF8) != 0xF8)
+ 320:	98 2f       	mov	r25, r24
+ 322:	98 7f       	andi	r25, 0xF8	; 248
+ 324:	98 3f       	cpi	r25, 0xF8	; 248
+ 326:	11 f0       	breq	.+4      	; 0x32c <__vector_11+0x40>
+			midi_buff_allowed = 0;		//reset running status only if not real time data
+ 328:	10 92 83 01 	sts	0x0183, r1	; 0x800183 <midi_buff_allowed>
+		//if (uart_data == MIDI_STOP)
+		//midi_clock_run = 0;
+		//if (uart_data == MIDI_CONT)
+		//midi_clock_run = 1;
+		//
+		if (((uart_data&0xE0) == MIDI_NOTE_OFF)){ //receives note ons too: &E0 !!
+ 32c:	98 2f       	mov	r25, r24
+ 32e:	90 7e       	andi	r25, 0xE0	; 224
+ 330:	90 38       	cpi	r25, 0x80	; 128
+ 332:	41 f4       	brne	.+16     	; 0x344 <__vector_11+0x58>
+			midi_buff[0] = uart_data;
+ 334:	80 93 85 01 	sts	0x0185, r24	; 0x800185 <midi_buff>
+			midi_buff_point = 1;
+ 338:	91 e0       	ldi	r25, 0x01	; 1
+ 33a:	90 93 84 01 	sts	0x0184, r25	; 0x800184 <midi_buff_point>
+			midi_buff_allowed = 2;
+ 33e:	92 e0       	ldi	r25, 0x02	; 2
+ 340:	90 93 83 01 	sts	0x0183, r25	; 0x800183 <midi_buff_allowed>
+			//set_LED(ENABLE);
+		}
+		if ((uart_data&0xF0) == MIDI_CC){
+ 344:	98 2f       	mov	r25, r24
+ 346:	90 7f       	andi	r25, 0xF0	; 240
+ 348:	90 3b       	cpi	r25, 0xB0	; 176
+ 34a:	09 f0       	breq	.+2      	; 0x34e <__vector_11+0x62>
+ 34c:	d5 c0       	rjmp	.+426    	; 0x4f8 <__stack+0x99>
+			midi_buff[0] = uart_data;
+ 34e:	80 93 85 01 	sts	0x0185, r24	; 0x800185 <midi_buff>
+			midi_buff_point = 1;
+ 352:	81 e0       	ldi	r24, 0x01	; 1
+ 354:	80 93 84 01 	sts	0x0184, r24	; 0x800184 <midi_buff_point>
+			midi_buff_allowed = 2;
+ 358:	82 e0       	ldi	r24, 0x02	; 2
+ 35a:	80 93 83 01 	sts	0x0183, r24	; 0x800183 <midi_buff_allowed>
+ 35e:	cc c0       	rjmp	.+408    	; 0x4f8 <__stack+0x99>
+		//
+		
+		
+		//}
+		
+		} else if (midi_buff_allowed > 0) {
+ 360:	90 91 83 01 	lds	r25, 0x0183	; 0x800183 <midi_buff_allowed>
+ 364:	99 23       	and	r25, r25
+ 366:	09 f4       	brne	.+2      	; 0x36a <__vector_11+0x7e>
+ 368:	c7 c0       	rjmp	.+398    	; 0x4f8 <__stack+0x99>
+		//receive bytes of instruction if allowed
+		midi_buff[midi_buff_point] = uart_data;
+ 36a:	90 91 84 01 	lds	r25, 0x0184	; 0x800184 <midi_buff_point>
+ 36e:	e9 2f       	mov	r30, r25
+ 370:	f0 e0       	ldi	r31, 0x00	; 0
+ 372:	eb 57       	subi	r30, 0x7B	; 123
+ 374:	fe 4f       	sbci	r31, 0xFE	; 254
+ 376:	80 83       	st	Z, r24
+		midi_buff_point++;
+ 378:	9f 5f       	subi	r25, 0xFF	; 255
+		
+		/************************************************************************/
+		/*                    MIDI Buffer translate                             */
+		/************************************************************************/
+		
+		if ((midi_buff_point == 3)) //3byte min for whole note message rx
+ 37a:	93 30       	cpi	r25, 0x03	; 3
+ 37c:	19 f0       	breq	.+6      	; 0x384 <__vector_11+0x98>
+		//}
+		
+		} else if (midi_buff_allowed > 0) {
+		//receive bytes of instruction if allowed
+		midi_buff[midi_buff_point] = uart_data;
+		midi_buff_point++;
+ 37e:	90 93 84 01 	sts	0x0184, r25	; 0x800184 <midi_buff_point>
+ 382:	ba c0       	rjmp	.+372    	; 0x4f8 <__stack+0x99>
+		/*                    MIDI Buffer translate                             */
+		/************************************************************************/
+		
+		if ((midi_buff_point == 3)) //3byte min for whole note message rx
+		{
+			midi_buff_point = 1;
+ 384:	81 e0       	ldi	r24, 0x01	; 1
+ 386:	80 93 84 01 	sts	0x0184, r24	; 0x800184 <midi_buff_point>
+
+			
+			//LEARN MODE ONLY:
+			if ((midi_learn_mode) && (midi_learn_current<8) && ((midi_buff[0]&0xF0)==MIDI_NOTE_ON)){//learn map from pressed button and midi RX		
+ 38a:	80 91 82 01 	lds	r24, 0x0182	; 0x800182 <midi_learn_mode>
+ 38e:	88 23       	and	r24, r24
+ 390:	09 f4       	brne	.+2      	; 0x394 <__vector_11+0xa8>
+ 392:	a9 c0       	rjmp	.+338    	; 0x4e6 <__stack+0x87>
+ 394:	80 91 81 01 	lds	r24, 0x0181	; 0x800181 <midi_learn_current>
+ 398:	88 30       	cpi	r24, 0x08	; 8
+ 39a:	08 f0       	brcs	.+2      	; 0x39e <__vector_11+0xb2>
+ 39c:	ad c0       	rjmp	.+346    	; 0x4f8 <__stack+0x99>
+ 39e:	90 91 85 01 	lds	r25, 0x0185	; 0x800185 <midi_buff>
+ 3a2:	29 2f       	mov	r18, r25
+ 3a4:	20 7f       	andi	r18, 0xF0	; 240
+ 3a6:	20 39       	cpi	r18, 0x90	; 144
+ 3a8:	09 f0       	breq	.+2      	; 0x3ac <__vector_11+0xc0>
+ 3aa:	a6 c0       	rjmp	.+332    	; 0x4f8 <__stack+0x99>
+ 3ac:	9f 70       	andi	r25, 0x0F	; 15
+				
+				if (((midi_buff[0]&0x0F) != midi_channel)&&(midi_learn_current==0))
+ 3ae:	20 91 67 00 	lds	r18, 0x0067	; 0x800067 <midi_channel>
+ 3b2:	92 17       	cp	r25, r18
+ 3b4:	09 f4       	brne	.+2      	; 0x3b8 <__vector_11+0xcc>
+ 3b6:	92 c0       	rjmp	.+292    	; 0x4dc <__stack+0x7d>
+ 3b8:	81 11       	cpse	r24, r1
+ 3ba:	9e c0       	rjmp	.+316    	; 0x4f8 <__stack+0x99>
+					midi_channel = (midi_buff[0]&0x0F); //IF CHANNEL 1 SELECTED ENABLE MIDI CHANNEL OVERRIDE
+ 3bc:	90 93 67 00 	sts	0x0067, r25	; 0x800067 <midi_channel>
+ 3c0:	8d c0       	rjmp	.+282    	; 0x4dc <__stack+0x7d>
+				
+				if (((midi_buff[0]&0x0F) == midi_channel) && (midi_buff[2] != 0)){
+					//ACTUALLY LEARN MAP FOR SELECTED CHANNEL HERE:
+					midi_note_map[midi_learn_current] = midi_buff[1];
+ 3c2:	e8 2f       	mov	r30, r24
+ 3c4:	f0 e0       	ldi	r31, 0x00	; 0
+ 3c6:	e0 59       	subi	r30, 0x90	; 144
+ 3c8:	ff 4f       	sbci	r31, 0xFF	; 255
+ 3ca:	c5 e8       	ldi	r28, 0x85	; 133
+ 3cc:	d1 e0       	ldi	r29, 0x01	; 1
+ 3ce:	99 81       	ldd	r25, Y+1	; 0x01
+ 3d0:	90 83       	st	Z, r25
+		
+					
+					//SET GATE ON CHANNEL TO SHOW STATUS
+					(* set_pin_ptr)(midi_learn_current);					
+ 3d2:	e0 91 64 00 	lds	r30, 0x0064	; 0x800064 <set_pin_ptr>
+ 3d6:	f0 91 65 00 	lds	r31, 0x0065	; 0x800065 <set_pin_ptr+0x1>
+ 3da:	09 95       	icall
+					//if(midi_learn_current == 0)
+						//PORTB &= 0xFE;//inverted cos of 74HC1G14 inverter 
+					//else
+						//PORTD &= 0xFF^(1 << midi_learn_current);//inverted cos of 74HC1G14 inverter 
+		
+					midi_learn_current++; //next channel	
+ 3dc:	80 91 81 01 	lds	r24, 0x0181	; 0x800181 <midi_learn_current>
+ 3e0:	8f 5f       	subi	r24, 0xFF	; 255
+ 3e2:	80 93 81 01 	sts	0x0181, r24	; 0x800181 <midi_learn_current>
+
+			}
+			
+			
+			//BUFFER TRANSLATE
+			if (((midi_buff[0]&0x0F) == midi_channel) && !(midi_learn_mode))
+ 3e6:	88 81       	ld	r24, Y
+ 3e8:	28 2f       	mov	r18, r24
+ 3ea:	2f 70       	andi	r18, 0x0F	; 15
+ 3ec:	90 91 67 00 	lds	r25, 0x0067	; 0x800067 <midi_channel>
+ 3f0:	29 13       	cpse	r18, r25
+ 3f2:	82 c0       	rjmp	.+260    	; 0x4f8 <__stack+0x99>
+ 3f4:	90 91 82 01 	lds	r25, 0x0182	; 0x800182 <midi_learn_mode>
+ 3f8:	91 11       	cpse	r25, r1
+ 3fa:	7e c0       	rjmp	.+252    	; 0x4f8 <__stack+0x99>
+			{
+				uint8_t i = 0;
+				
+				
+				if(((midi_buff[0]&0xF0) == MIDI_NOTE_ON)||((midi_buff[0]&0xF0) == MIDI_NOTE_OFF)){
+ 3fc:	80 7e       	andi	r24, 0xE0	; 224
+ 3fe:	80 38       	cpi	r24, 0x80	; 128
+ 400:	69 f5       	brne	.+90     	; 0x45c <__DATA_REGION_LENGTH__+0x5c>
+ 402:	00 e7       	ldi	r16, 0x70	; 112
+ 404:	10 e0       	ldi	r17, 0x00	; 0
+ 406:	c0 e0       	ldi	r28, 0x00	; 0
+					for (i=0;i<8;i++){
+						if(midi_buff[1]==midi_note_map[i]){
+ 408:	0f 2e       	mov	r0, r31
+ 40a:	f5 e8       	ldi	r31, 0x85	; 133
+ 40c:	ef 2e       	mov	r14, r31
+ 40e:	f1 e0       	ldi	r31, 0x01	; 1
+ 410:	ff 2e       	mov	r15, r31
+ 412:	f0 2d       	mov	r31, r0
+ 414:	f8 01       	movw	r30, r16
+ 416:	81 91       	ld	r24, Z+
+ 418:	8f 01       	movw	r16, r30
+ 41a:	f7 01       	movw	r30, r14
+ 41c:	91 81       	ldd	r25, Z+1	; 0x01
+ 41e:	98 13       	cpse	r25, r24
+ 420:	1a c0       	rjmp	.+52     	; 0x456 <__DATA_REGION_LENGTH__+0x56>
+							if (((midi_buff[0]&MIDI_NOTE_ON)==MIDI_NOTE_ON) && (midi_buff[2] != 0)){//&&(midi_buff[2] != 0))
+ 422:	80 81       	ld	r24, Z
+ 424:	80 79       	andi	r24, 0x90	; 144
+ 426:	80 39       	cpi	r24, 0x90	; 144
+ 428:	81 f4       	brne	.+32     	; 0x44a <__DATA_REGION_LENGTH__+0x4a>
+ 42a:	62 81       	ldd	r22, Z+2	; 0x02
+ 42c:	66 23       	and	r22, r22
+ 42e:	69 f0       	breq	.+26     	; 0x44a <__DATA_REGION_LENGTH__+0x4a>
+								if(module_mode==MODE_VELOCITY)
+ 430:	80 91 66 00 	lds	r24, 0x0066	; 0x800066 <module_mode>
+ 434:	81 30       	cpi	r24, 0x01	; 1
+ 436:	11 f4       	brne	.+4      	; 0x43c <__DATA_REGION_LENGTH__+0x3c>
+									set_velocity(i,midi_buff[2]); 
+ 438:	8c 2f       	mov	r24, r28
+ 43a:	4c df       	rcall	.-360    	; 0x2d4 <set_velocity>
+								(* set_pin_ptr)(i);
+ 43c:	e0 91 64 00 	lds	r30, 0x0064	; 0x800064 <set_pin_ptr>
+ 440:	f0 91 65 00 	lds	r31, 0x0065	; 0x800065 <set_pin_ptr+0x1>
+ 444:	8c 2f       	mov	r24, r28
+ 446:	09 95       	icall
+ 448:	06 c0       	rjmp	.+12     	; 0x456 <__DATA_REGION_LENGTH__+0x56>
+							}else
+							(*clear_pin_ptr)(i);
+ 44a:	e0 91 62 00 	lds	r30, 0x0062	; 0x800062 <clear_pin_ptr>
+ 44e:	f0 91 63 00 	lds	r31, 0x0063	; 0x800063 <clear_pin_ptr+0x1>
+ 452:	8c 2f       	mov	r24, r28
+ 454:	09 95       	icall
+			{
+				uint8_t i = 0;
+				
+				
+				if(((midi_buff[0]&0xF0) == MIDI_NOTE_ON)||((midi_buff[0]&0xF0) == MIDI_NOTE_OFF)){
+					for (i=0;i<8;i++){
+ 456:	cf 5f       	subi	r28, 0xFF	; 255
+ 458:	c8 30       	cpi	r28, 0x08	; 8
+ 45a:	e1 f6       	brne	.-72     	; 0x414 <__DATA_REGION_LENGTH__+0x14>
+							(*clear_pin_ptr)(i);
+						}
+					}
+				}//NOTE ON OR NOTE OFF
+				 
+				if (((midi_buff[0]&0xF0) == MIDI_CC)&&(module_mode==MODE_CC)){
+ 45c:	80 91 85 01 	lds	r24, 0x0185	; 0x800185 <midi_buff>
+ 460:	80 7f       	andi	r24, 0xF0	; 240
+ 462:	80 3b       	cpi	r24, 0xB0	; 176
+ 464:	09 f0       	breq	.+2      	; 0x468 <__stack+0x9>
+ 466:	48 c0       	rjmp	.+144    	; 0x4f8 <__stack+0x99>
+ 468:	80 91 66 00 	lds	r24, 0x0066	; 0x800066 <module_mode>
+ 46c:	82 30       	cpi	r24, 0x02	; 2
+ 46e:	09 f0       	breq	.+2      	; 0x472 <__stack+0x13>
+ 470:	43 c0       	rjmp	.+134    	; 0x4f8 <__stack+0x99>
+					uint8_t controller = 0;
+					controller = midi_buff[1];
+										
+					switch(controller){
+ 472:	e0 91 86 01 	lds	r30, 0x0186	; 0x800186 <midi_buff+0x1>
+ 476:	8e 2f       	mov	r24, r30
+ 478:	90 e0       	ldi	r25, 0x00	; 0
+ 47a:	fc 01       	movw	r30, r24
+ 47c:	e5 54       	subi	r30, 0x45	; 69
+ 47e:	f1 09       	sbc	r31, r1
+ 480:	e8 30       	cpi	r30, 0x08	; 8
+ 482:	f1 05       	cpc	r31, r1
+ 484:	c8 f5       	brcc	.+114    	; 0x4f8 <__stack+0x99>
+ 486:	ed 5d       	subi	r30, 0xDD	; 221
+ 488:	ff 4f       	sbci	r31, 0xFF	; 255
+ 48a:	09 94       	ijmp
+						case 69: set_velocity(0,midi_buff[2]); break;
+ 48c:	60 91 87 01 	lds	r22, 0x0187	; 0x800187 <midi_buff+0x2>
+ 490:	80 e0       	ldi	r24, 0x00	; 0
+ 492:	20 df       	rcall	.-448    	; 0x2d4 <set_velocity>
+ 494:	31 c0       	rjmp	.+98     	; 0x4f8 <__stack+0x99>
+						case 70: set_velocity(1,midi_buff[2]); break;
+ 496:	60 91 87 01 	lds	r22, 0x0187	; 0x800187 <midi_buff+0x2>
+ 49a:	81 e0       	ldi	r24, 0x01	; 1
+ 49c:	1b df       	rcall	.-458    	; 0x2d4 <set_velocity>
+ 49e:	2c c0       	rjmp	.+88     	; 0x4f8 <__stack+0x99>
+						case 71: set_velocity(2,midi_buff[2]); break;
+ 4a0:	60 91 87 01 	lds	r22, 0x0187	; 0x800187 <midi_buff+0x2>
+ 4a4:	82 e0       	ldi	r24, 0x02	; 2
+ 4a6:	16 df       	rcall	.-468    	; 0x2d4 <set_velocity>
+ 4a8:	27 c0       	rjmp	.+78     	; 0x4f8 <__stack+0x99>
+						case 72: set_velocity(3,midi_buff[2]); break;
+ 4aa:	60 91 87 01 	lds	r22, 0x0187	; 0x800187 <midi_buff+0x2>
+ 4ae:	83 e0       	ldi	r24, 0x03	; 3
+ 4b0:	11 df       	rcall	.-478    	; 0x2d4 <set_velocity>
+ 4b2:	22 c0       	rjmp	.+68     	; 0x4f8 <__stack+0x99>
+						case 73: set_velocity(4,midi_buff[2]); break;
+ 4b4:	60 91 87 01 	lds	r22, 0x0187	; 0x800187 <midi_buff+0x2>
+ 4b8:	84 e0       	ldi	r24, 0x04	; 4
+ 4ba:	0c df       	rcall	.-488    	; 0x2d4 <set_velocity>
+ 4bc:	1d c0       	rjmp	.+58     	; 0x4f8 <__stack+0x99>
+						case 74: set_velocity(5,midi_buff[2]); break;
+ 4be:	60 91 87 01 	lds	r22, 0x0187	; 0x800187 <midi_buff+0x2>
+ 4c2:	85 e0       	ldi	r24, 0x05	; 5
+ 4c4:	07 df       	rcall	.-498    	; 0x2d4 <set_velocity>
+ 4c6:	18 c0       	rjmp	.+48     	; 0x4f8 <__stack+0x99>
+						case 75: set_velocity(6,midi_buff[2]); break;
+ 4c8:	60 91 87 01 	lds	r22, 0x0187	; 0x800187 <midi_buff+0x2>
+ 4cc:	86 e0       	ldi	r24, 0x06	; 6
+ 4ce:	02 df       	rcall	.-508    	; 0x2d4 <set_velocity>
+ 4d0:	13 c0       	rjmp	.+38     	; 0x4f8 <__stack+0x99>
+						case 76: set_velocity(7,midi_buff[2]); break;
+ 4d2:	60 91 87 01 	lds	r22, 0x0187	; 0x800187 <midi_buff+0x2>
+ 4d6:	87 e0       	ldi	r24, 0x07	; 7
+ 4d8:	fd de       	rcall	.-518    	; 0x2d4 <set_velocity>
+					
+				}//END CC
+			}
+		}
+	}
+} //end ISR
+ 4da:	0e c0       	rjmp	.+28     	; 0x4f8 <__stack+0x99>
+			if ((midi_learn_mode) && (midi_learn_current<8) && ((midi_buff[0]&0xF0)==MIDI_NOTE_ON)){//learn map from pressed button and midi RX		
+				
+				if (((midi_buff[0]&0x0F) != midi_channel)&&(midi_learn_current==0))
+					midi_channel = (midi_buff[0]&0x0F); //IF CHANNEL 1 SELECTED ENABLE MIDI CHANNEL OVERRIDE
+				
+				if (((midi_buff[0]&0x0F) == midi_channel) && (midi_buff[2] != 0)){
+ 4dc:	90 91 87 01 	lds	r25, 0x0187	; 0x800187 <midi_buff+0x2>
+ 4e0:	99 23       	and	r25, r25
+ 4e2:	51 f0       	breq	.+20     	; 0x4f8 <__stack+0x99>
+ 4e4:	6e cf       	rjmp	.-292    	; 0x3c2 <__vector_11+0xd6>
+
+			}
+			
+			
+			//BUFFER TRANSLATE
+			if (((midi_buff[0]&0x0F) == midi_channel) && !(midi_learn_mode))
+ 4e6:	80 91 85 01 	lds	r24, 0x0185	; 0x800185 <midi_buff>
+ 4ea:	28 2f       	mov	r18, r24
+ 4ec:	2f 70       	andi	r18, 0x0F	; 15
+ 4ee:	90 91 67 00 	lds	r25, 0x0067	; 0x800067 <midi_channel>
+ 4f2:	29 17       	cp	r18, r25
+ 4f4:	09 f4       	brne	.+2      	; 0x4f8 <__stack+0x99>
+ 4f6:	82 cf       	rjmp	.-252    	; 0x3fc <__vector_11+0x110>
+					
+				}//END CC
+			}
+		}
+	}
+} //end ISR
+ 4f8:	ff 91       	pop	r31
+ 4fa:	ef 91       	pop	r30
+ 4fc:	df 91       	pop	r29
+ 4fe:	cf 91       	pop	r28
+ 500:	bf 91       	pop	r27
+ 502:	af 91       	pop	r26
+ 504:	9f 91       	pop	r25
+ 506:	8f 91       	pop	r24
+ 508:	7f 91       	pop	r23
+ 50a:	6f 91       	pop	r22
+ 50c:	5f 91       	pop	r21
+ 50e:	4f 91       	pop	r20
+ 510:	3f 91       	pop	r19
+ 512:	2f 91       	pop	r18
+ 514:	1f 91       	pop	r17
+ 516:	0f 91       	pop	r16
+ 518:	ff 90       	pop	r15
+ 51a:	ef 90       	pop	r14
+ 51c:	0f 90       	pop	r0
+ 51e:	0f be       	out	0x3f, r0	; 63
+ 520:	0f 90       	pop	r0
+ 522:	1f 90       	pop	r1
+ 524:	18 95       	reti
+
+00000526 <set_LED>:
+
+
+
+void set_LED(uint8_t var){
+	
+	if (var==ENABLE)
+ 526:	81 30       	cpi	r24, 0x01	; 1
+ 528:	11 f4       	brne	.+4      	; 0x52e <set_LED+0x8>
+		DDRC |= (1<<LED_pin);
+ 52a:	a0 9a       	sbi	0x14, 0	; 20
+ 52c:	08 95       	ret
+	
+	if(var==DISABLE)
+ 52e:	81 11       	cpse	r24, r1
+ 530:	02 c0       	rjmp	.+4      	; 0x536 <set_LED+0x10>
+		DDRC &= 0xFF^(1 << LED_pin);
+ 532:	a0 98       	cbi	0x14, 0	; 20
+ 534:	08 95       	ret
+	
+	if(var==TOGGLE)
+ 536:	82 30       	cpi	r24, 0x02	; 2
+ 538:	21 f4       	brne	.+8      	; 0x542 <set_LED+0x1c>
+		DDRC ^= (1<<LED_pin);
+ 53a:	94 b3       	in	r25, 0x14	; 20
+ 53c:	81 e0       	ldi	r24, 0x01	; 1
+ 53e:	89 27       	eor	r24, r25
+ 540:	84 bb       	out	0x14, r24	; 20
+ 542:	08 95       	ret
+
+00000544 <midi_learn>:
+/*						 MIDI LEARN			                            */
+/************************************************************************/
+
+
+void midi_learn(void)
+{	
+ 544:	cf 92       	push	r12
+ 546:	df 92       	push	r13
+ 548:	ef 92       	push	r14
+ 54a:	ff 92       	push	r15
+ 54c:	0f 93       	push	r16
+ 54e:	1f 93       	push	r17
+ 550:	cf 93       	push	r28
+ 552:	df 93       	push	r29
+	static uint8_t button_bounce = 0;
+	static uint8_t button_last = 0;
+	uint8_t blink_counter = 1;
+	uint8_t firstrelease_flag = 1;
+		
+	midi_learn_mode = 1; //set global flag for MIDI RX ISR
+ 554:	81 e0       	ldi	r24, 0x01	; 1
+ 556:	80 93 82 01 	sts	0x0182, r24	; 0x800182 <midi_learn_mode>
+	midi_learn_current = 0;
+ 55a:	10 92 81 01 	sts	0x0181, r1	; 0x800181 <midi_learn_current>
+	//ALL OFF
+	(*clear_pin_ptr)(0);
+ 55e:	e0 91 62 00 	lds	r30, 0x0062	; 0x800062 <clear_pin_ptr>
+ 562:	f0 91 63 00 	lds	r31, 0x0063	; 0x800063 <clear_pin_ptr+0x1>
+ 566:	80 e0       	ldi	r24, 0x00	; 0
+ 568:	09 95       	icall
+	(*clear_pin_ptr)(1);
+ 56a:	e0 91 62 00 	lds	r30, 0x0062	; 0x800062 <clear_pin_ptr>
+ 56e:	f0 91 63 00 	lds	r31, 0x0063	; 0x800063 <clear_pin_ptr+0x1>
+ 572:	81 e0       	ldi	r24, 0x01	; 1
+ 574:	09 95       	icall
+	(*clear_pin_ptr)(2);
+ 576:	e0 91 62 00 	lds	r30, 0x0062	; 0x800062 <clear_pin_ptr>
+ 57a:	f0 91 63 00 	lds	r31, 0x0063	; 0x800063 <clear_pin_ptr+0x1>
+ 57e:	82 e0       	ldi	r24, 0x02	; 2
+ 580:	09 95       	icall
+	(*clear_pin_ptr)(3);
+ 582:	e0 91 62 00 	lds	r30, 0x0062	; 0x800062 <clear_pin_ptr>
+ 586:	f0 91 63 00 	lds	r31, 0x0063	; 0x800063 <clear_pin_ptr+0x1>
+ 58a:	83 e0       	ldi	r24, 0x03	; 3
+ 58c:	09 95       	icall
+	(*clear_pin_ptr)(4);
+ 58e:	e0 91 62 00 	lds	r30, 0x0062	; 0x800062 <clear_pin_ptr>
+ 592:	f0 91 63 00 	lds	r31, 0x0063	; 0x800063 <clear_pin_ptr+0x1>
+ 596:	84 e0       	ldi	r24, 0x04	; 4
+ 598:	09 95       	icall
+	(*clear_pin_ptr)(5);
+ 59a:	e0 91 62 00 	lds	r30, 0x0062	; 0x800062 <clear_pin_ptr>
+ 59e:	f0 91 63 00 	lds	r31, 0x0063	; 0x800063 <clear_pin_ptr+0x1>
+ 5a2:	85 e0       	ldi	r24, 0x05	; 5
+ 5a4:	09 95       	icall
+	(*clear_pin_ptr)(6);
+ 5a6:	e0 91 62 00 	lds	r30, 0x0062	; 0x800062 <clear_pin_ptr>
+ 5aa:	f0 91 63 00 	lds	r31, 0x0063	; 0x800063 <clear_pin_ptr+0x1>
+ 5ae:	86 e0       	ldi	r24, 0x06	; 6
+ 5b0:	09 95       	icall
+	(*clear_pin_ptr)(7);
+ 5b2:	e0 91 62 00 	lds	r30, 0x0062	; 0x800062 <clear_pin_ptr>
+ 5b6:	f0 91 63 00 	lds	r31, 0x0063	; 0x800063 <clear_pin_ptr+0x1>
+ 5ba:	87 e0       	ldi	r24, 0x07	; 7
+ 5bc:	09 95       	icall
+
+	set_LED(ENABLE);
+ 5be:	81 e0       	ldi	r24, 0x01	; 1
+ 5c0:	b2 df       	rcall	.-156    	; 0x526 <set_LED>
+	static uint8_t learn_button = BUTTON_UP;
+	static uint8_t button_now = 0;
+	static uint8_t button_bounce = 0;
+	static uint8_t button_last = 0;
+	uint8_t blink_counter = 1;
+	uint8_t firstrelease_flag = 1;
+ 5c2:	01 e0       	ldi	r16, 0x01	; 1
+{	
+	static uint8_t learn_button = BUTTON_UP;
+	static uint8_t button_now = 0;
+	static uint8_t button_bounce = 0;
+	static uint8_t button_last = 0;
+	uint8_t blink_counter = 1;
+ 5c4:	d1 e0       	ldi	r29, 0x01	; 1
+			if(learn_button == BUTTON_DOWN){
+				if(setting_wait_flag == 1){
+					if (setting_wait_counter >=200){
+						setting_wait_counter = 0;
+						setting_wait_flag = 0;			
+						midi_learn_current = 8; // leave 
+ 5c6:	68 94       	set
+ 5c8:	cc 24       	eor	r12, r12
+ 5ca:	c3 f8       	bld	r12, 3
+			
+				firstrelease_flag = 0;
+			}
+
+			if (learn_button == BUTTON_PRESSED){
+				learn_button = BUTTON_DOWN;
+ 5cc:	68 94       	set
+ 5ce:	ff 24       	eor	r15, r15
+ 5d0:	f1 f8       	bld	r15, 1
+				//set_LED(ENABLE);
+				if(setting_wait_flag == 0){	//START THE WAIT
+					setting_wait_counter = 0;
+					setting_wait_flag = 1;
+ 5d2:	11 e0       	ldi	r17, 0x01	; 1
+						
+					if(button_now == 0){
+						learn_button = BUTTON_RELEASED;
+						//set_LED(DISABLE);
+						}else{
+						learn_button = BUTTON_PRESSED;
+ 5d4:	0f 2e       	mov	r0, r31
+ 5d6:	f3 e0       	ldi	r31, 0x03	; 3
+ 5d8:	df 2e       	mov	r13, r31
+ 5da:	f0 2d       	mov	r31, r0
+				}else{
+					
+				if (button_now != button_last){
+						
+					if(button_now == 0){
+						learn_button = BUTTON_RELEASED;
+ 5dc:	68 94       	set
+ 5de:	ee 24       	eor	r14, r14
+ 5e0:	e2 f8       	bld	r14, 2
+	(*clear_pin_ptr)(6);
+	(*clear_pin_ptr)(7);
+
+	set_LED(ENABLE);
+	
+	while(midi_learn_current<8){
+ 5e2:	77 c0       	rjmp	.+238    	; 0x6d2 <midi_learn+0x18e>
+
+			//CHECK FOR LEAVE SETTINGS MENU - LEARN BUTTON HAS TO BE DOWN FOR 3 SEC
+			if ((learn_button == BUTTON_RELEASED)){
+ 5e4:	80 91 60 00 	lds	r24, 0x0060	; 0x800060 <__DATA_REGION_ORIGIN__>
+ 5e8:	84 30       	cpi	r24, 0x04	; 4
+ 5ea:	a1 f4       	brne	.+40     	; 0x614 <midi_learn+0xd0>
+				setting_wait_counter = 0;
+ 5ec:	10 92 7f 01 	sts	0x017F, r1	; 0x80017f <setting_wait_counter+0x1>
+ 5f0:	10 92 7e 01 	sts	0x017E, r1	; 0x80017e <setting_wait_counter>
+				setting_wait_flag = 0;
+ 5f4:	10 92 7d 01 	sts	0x017D, r1	; 0x80017d <setting_wait_flag>
+				learn_button = BUTTON_UP;
+ 5f8:	10 93 60 00 	sts	0x0060, r17	; 0x800060 <__DATA_REGION_ORIGIN__>
+	
+				if (!firstrelease_flag){
+ 5fc:	01 11       	cpse	r16, r1
+ 5fe:	ba c0       	rjmp	.+372    	; 0x774 <midi_learn+0x230>
+					if (module_mode==MODE_VELOCITY)
+ 600:	80 91 66 00 	lds	r24, 0x0066	; 0x800066 <module_mode>
+ 604:	81 30       	cpi	r24, 0x01	; 1
+ 606:	19 f4       	brne	.+6      	; 0x60e <midi_learn+0xca>
+						module_mode = MODE_CC;
+ 608:	f0 92 66 00 	sts	0x0066, r15	; 0x800066 <module_mode>
+ 60c:	b3 c0       	rjmp	.+358    	; 0x774 <midi_learn+0x230>
+					else
+						module_mode = MODE_VELOCITY;
+ 60e:	10 93 66 00 	sts	0x0066, r17	; 0x800066 <module_mode>
+ 612:	b0 c0       	rjmp	.+352    	; 0x774 <midi_learn+0x230>
+				}
+			
+				firstrelease_flag = 0;
+			}
+
+			if (learn_button == BUTTON_PRESSED){
+ 614:	83 30       	cpi	r24, 0x03	; 3
+ 616:	69 f4       	brne	.+26     	; 0x632 <midi_learn+0xee>
+				learn_button = BUTTON_DOWN;
+ 618:	f0 92 60 00 	sts	0x0060, r15	; 0x800060 <__DATA_REGION_ORIGIN__>
+				//set_LED(ENABLE);
+				if(setting_wait_flag == 0){	//START THE WAIT
+ 61c:	80 91 7d 01 	lds	r24, 0x017D	; 0x80017d <setting_wait_flag>
+ 620:	81 11       	cpse	r24, r1
+ 622:	0b c0       	rjmp	.+22     	; 0x63a <midi_learn+0xf6>
+					setting_wait_counter = 0;
+ 624:	10 92 7f 01 	sts	0x017F, r1	; 0x80017f <setting_wait_counter+0x1>
+ 628:	10 92 7e 01 	sts	0x017E, r1	; 0x80017e <setting_wait_counter>
+					setting_wait_flag = 1;
+ 62c:	10 93 7d 01 	sts	0x017D, r17	; 0x80017d <setting_wait_flag>
+ 630:	08 c0       	rjmp	.+16     	; 0x642 <midi_learn+0xfe>
+				}
+			}
+			
+			if(learn_button == BUTTON_DOWN){
+ 632:	80 91 60 00 	lds	r24, 0x0060	; 0x800060 <__DATA_REGION_ORIGIN__>
+ 636:	82 30       	cpi	r24, 0x02	; 2
+ 638:	99 f4       	brne	.+38     	; 0x660 <midi_learn+0x11c>
+				if(setting_wait_flag == 1){
+ 63a:	80 91 7d 01 	lds	r24, 0x017D	; 0x80017d <setting_wait_flag>
+ 63e:	81 30       	cpi	r24, 0x01	; 1
+ 640:	79 f4       	brne	.+30     	; 0x660 <midi_learn+0x11c>
+					if (setting_wait_counter >=200){
+ 642:	80 91 7e 01 	lds	r24, 0x017E	; 0x80017e <setting_wait_counter>
+ 646:	90 91 7f 01 	lds	r25, 0x017F	; 0x80017f <setting_wait_counter+0x1>
+ 64a:	88 3c       	cpi	r24, 0xC8	; 200
+ 64c:	91 05       	cpc	r25, r1
+ 64e:	40 f0       	brcs	.+16     	; 0x660 <midi_learn+0x11c>
+						setting_wait_counter = 0;
+ 650:	10 92 7f 01 	sts	0x017F, r1	; 0x80017f <setting_wait_counter+0x1>
+ 654:	10 92 7e 01 	sts	0x017E, r1	; 0x80017e <setting_wait_counter>
+						setting_wait_flag = 0;			
+ 658:	10 92 7d 01 	sts	0x017D, r1	; 0x80017d <setting_wait_flag>
+						midi_learn_current = 8; // leave 
+ 65c:	c0 92 81 01 	sts	0x0181, r12	; 0x800181 <midi_learn_current>
+		
+		
+		/************************************************************************/
+		/*                    keyscan                                           */
+		/************************************************************************/
+		if ((TIFR>>OCF2)&1)
+ 660:	08 b6       	in	r0, 0x38	; 56
+ 662:	07 fe       	sbrs	r0, 7
+ 664:	36 c0       	rjmp	.+108    	; 0x6d2 <midi_learn+0x18e>
+		{
+			//keyscan(&buttons);
+			TCNT2 = 0; //reset timer
+ 666:	14 bc       	out	0x24, r1	; 36
+			TIFR |= (1 << OCF2); //reset flag
+ 668:	88 b7       	in	r24, 0x38	; 56
+ 66a:	80 68       	ori	r24, 0x80	; 128
+ 66c:	88 bf       	out	0x38, r24	; 56
+				
+			button_now = PINC & (1 << BUTTON_PIN);
+ 66e:	c3 b3       	in	r28, 0x13	; 19
+ 670:	c2 70       	andi	r28, 0x02	; 2
+ 672:	c0 93 7a 01 	sts	0x017A, r28	; 0x80017a <button_now.2196>
+			
+			blink_counter++;
+ 676:	df 5f       	subi	r29, 0xFF	; 255
+			
+			if ((blink_counter&0xF) == 0){
+ 678:	8d 2f       	mov	r24, r29
+ 67a:	8f 70       	andi	r24, 0x0F	; 15
+ 67c:	49 f4       	brne	.+18     	; 0x690 <midi_learn+0x14c>
+				if (module_mode==MODE_VELOCITY)
+ 67e:	80 91 66 00 	lds	r24, 0x0066	; 0x800066 <module_mode>
+ 682:	81 30       	cpi	r24, 0x01	; 1
+ 684:	19 f4       	brne	.+6      	; 0x68c <midi_learn+0x148>
+					set_LED(ENABLE);
+ 686:	81 2f       	mov	r24, r17
+ 688:	4e df       	rcall	.-356    	; 0x526 <set_LED>
+ 68a:	02 c0       	rjmp	.+4      	; 0x690 <midi_learn+0x14c>
+				else
+					set_LED(TOGGLE);
+ 68c:	8f 2d       	mov	r24, r15
+ 68e:	4b df       	rcall	.-362    	; 0x526 <set_LED>
+			}	
+					
+			if (button_now != button_bounce){
+ 690:	80 91 79 01 	lds	r24, 0x0179	; 0x800179 <button_bounce.2197>
+ 694:	c8 17       	cp	r28, r24
+ 696:	19 f0       	breq	.+6      	; 0x69e <midi_learn+0x15a>
+				button_bounce = button_now;
+ 698:	c0 93 79 01 	sts	0x0179, r28	; 0x800179 <button_bounce.2197>
+ 69c:	0d c0       	rjmp	.+26     	; 0x6b8 <midi_learn+0x174>
+				}else{
+					
+				if (button_now != button_last){
+ 69e:	80 91 78 01 	lds	r24, 0x0178	; 0x800178 <__data_end>
+ 6a2:	c8 17       	cp	r28, r24
+ 6a4:	49 f0       	breq	.+18     	; 0x6b8 <midi_learn+0x174>
+						
+					if(button_now == 0){
+ 6a6:	c1 11       	cpse	r28, r1
+ 6a8:	03 c0       	rjmp	.+6      	; 0x6b0 <midi_learn+0x16c>
+						learn_button = BUTTON_RELEASED;
+ 6aa:	e0 92 60 00 	sts	0x0060, r14	; 0x800060 <__DATA_REGION_ORIGIN__>
+ 6ae:	02 c0       	rjmp	.+4      	; 0x6b4 <midi_learn+0x170>
+						//set_LED(DISABLE);
+						}else{
+						learn_button = BUTTON_PRESSED;
+ 6b0:	d0 92 60 00 	sts	0x0060, r13	; 0x800060 <__DATA_REGION_ORIGIN__>
+						//	set_LED(ENABLE);
+					}
+						
+					button_last = button_now;
+ 6b4:	c0 93 78 01 	sts	0x0178, r28	; 0x800178 <__data_end>
+				}
+			}
+
+			if(setting_wait_flag == 1)
+ 6b8:	80 91 7d 01 	lds	r24, 0x017D	; 0x80017d <setting_wait_flag>
+ 6bc:	81 30       	cpi	r24, 0x01	; 1
+ 6be:	49 f4       	brne	.+18     	; 0x6d2 <midi_learn+0x18e>
+			setting_wait_counter++;
+ 6c0:	80 91 7e 01 	lds	r24, 0x017E	; 0x80017e <setting_wait_counter>
+ 6c4:	90 91 7f 01 	lds	r25, 0x017F	; 0x80017f <setting_wait_counter+0x1>
+ 6c8:	01 96       	adiw	r24, 0x01	; 1
+ 6ca:	90 93 7f 01 	sts	0x017F, r25	; 0x80017f <setting_wait_counter+0x1>
+ 6ce:	80 93 7e 01 	sts	0x017E, r24	; 0x80017e <setting_wait_counter>
+	(*clear_pin_ptr)(6);
+	(*clear_pin_ptr)(7);
+
+	set_LED(ENABLE);
+	
+	while(midi_learn_current<8){
+ 6d2:	80 91 81 01 	lds	r24, 0x0181	; 0x800181 <midi_learn_current>
+ 6d6:	88 30       	cpi	r24, 0x08	; 8
+ 6d8:	08 f4       	brcc	.+2      	; 0x6dc <midi_learn+0x198>
+ 6da:	84 cf       	rjmp	.-248    	; 0x5e4 <midi_learn+0xa0>
+			setting_wait_counter++;
+		} //KEYSCAN END
+
+	} //STAY HERE LOOP END
+	
+	midi_learn_mode=0;//DONE LEARNING!
+ 6dc:	10 92 82 01 	sts	0x0182, r1	; 0x800182 <midi_learn_mode>
+	
+	set_LED(DISABLE);
+ 6e0:	80 e0       	ldi	r24, 0x00	; 0
+ 6e2:	21 df       	rcall	.-446    	; 0x526 <set_LED>
+
+
+	//SAVE TO EEPROM 
+	do {} while (!eeprom_is_ready());
+ 6e4:	e1 99       	sbic	0x1c, 1	; 28
+ 6e6:	fe cf       	rjmp	.-4      	; 0x6e4 <midi_learn+0x1a0>
+	//save Channel
+	//midi_channel = eeprom_read_byte(EEPROM_CHANNEL_ADDR);
+	eeprom_write_byte(EEPROM_CHANNEL_ADDR,midi_channel);
+ 6e8:	60 91 67 00 	lds	r22, 0x0067	; 0x800067 <midi_channel>
+ 6ec:	80 e0       	ldi	r24, 0x00	; 0
+ 6ee:	91 e0       	ldi	r25, 0x01	; 1
+ 6f0:	bf d1       	rcall	.+894    	; 0xa70 <eeprom_write_byte>
+	
+	do {} while (!eeprom_is_ready());
+ 6f2:	e1 99       	sbic	0x1c, 1	; 28
+ 6f4:	fe cf       	rjmp	.-4      	; 0x6f2 <midi_learn+0x1ae>
+	//save Channel
+	//midi_channel = eeprom_read_byte(EEPROM_CHANNEL_ADDR);
+	eeprom_write_byte(EEPROM_MODE_ADDR,module_mode);
+ 6f6:	60 91 66 00 	lds	r22, 0x0066	; 0x800066 <module_mode>
+ 6fa:	80 e1       	ldi	r24, 0x10	; 16
+ 6fc:	91 e0       	ldi	r25, 0x01	; 1
+ 6fe:	b8 d1       	rcall	.+880    	; 0xa70 <eeprom_write_byte>
+			
+	do {} while (!eeprom_is_ready());
+ 700:	e1 99       	sbic	0x1c, 1	; 28
+ 702:	fe cf       	rjmp	.-4      	; 0x700 <midi_learn+0x1bc>
+	//load map
+	//	eeprom_read_block(&midi_note_map,EEPROM_MAP_ADDR,8);
+	eeprom_write_block(&midi_note_map,EEPROM_MAP_ADDR,8);
+ 704:	48 e0       	ldi	r20, 0x08	; 8
+ 706:	50 e0       	ldi	r21, 0x00	; 0
+ 708:	61 e0       	ldi	r22, 0x01	; 1
+ 70a:	71 e0       	ldi	r23, 0x01	; 1
+ 70c:	80 e7       	ldi	r24, 0x70	; 112
+ 70e:	90 e0       	ldi	r25, 0x00	; 0
+ 710:	a6 d1       	rcall	.+844    	; 0xa5e <eeprom_write_block>
+
+	//ALL OFF
+	(*clear_pin_ptr)(0);
+ 712:	e0 91 62 00 	lds	r30, 0x0062	; 0x800062 <clear_pin_ptr>
+ 716:	f0 91 63 00 	lds	r31, 0x0063	; 0x800063 <clear_pin_ptr+0x1>
+ 71a:	80 e0       	ldi	r24, 0x00	; 0
+ 71c:	09 95       	icall
+	(*clear_pin_ptr)(1);
+ 71e:	e0 91 62 00 	lds	r30, 0x0062	; 0x800062 <clear_pin_ptr>
+ 722:	f0 91 63 00 	lds	r31, 0x0063	; 0x800063 <clear_pin_ptr+0x1>
+ 726:	81 e0       	ldi	r24, 0x01	; 1
+ 728:	09 95       	icall
+	(*clear_pin_ptr)(2);
+ 72a:	e0 91 62 00 	lds	r30, 0x0062	; 0x800062 <clear_pin_ptr>
+ 72e:	f0 91 63 00 	lds	r31, 0x0063	; 0x800063 <clear_pin_ptr+0x1>
+ 732:	82 e0       	ldi	r24, 0x02	; 2
+ 734:	09 95       	icall
+	(*clear_pin_ptr)(3);
+ 736:	e0 91 62 00 	lds	r30, 0x0062	; 0x800062 <clear_pin_ptr>
+ 73a:	f0 91 63 00 	lds	r31, 0x0063	; 0x800063 <clear_pin_ptr+0x1>
+ 73e:	83 e0       	ldi	r24, 0x03	; 3
+ 740:	09 95       	icall
+	(*clear_pin_ptr)(4);
+ 742:	e0 91 62 00 	lds	r30, 0x0062	; 0x800062 <clear_pin_ptr>
+ 746:	f0 91 63 00 	lds	r31, 0x0063	; 0x800063 <clear_pin_ptr+0x1>
+ 74a:	84 e0       	ldi	r24, 0x04	; 4
+ 74c:	09 95       	icall
+	(*clear_pin_ptr)(5);
+ 74e:	e0 91 62 00 	lds	r30, 0x0062	; 0x800062 <clear_pin_ptr>
+ 752:	f0 91 63 00 	lds	r31, 0x0063	; 0x800063 <clear_pin_ptr+0x1>
+ 756:	85 e0       	ldi	r24, 0x05	; 5
+ 758:	09 95       	icall
+	(*clear_pin_ptr)(6);
+ 75a:	e0 91 62 00 	lds	r30, 0x0062	; 0x800062 <clear_pin_ptr>
+ 75e:	f0 91 63 00 	lds	r31, 0x0063	; 0x800063 <clear_pin_ptr+0x1>
+ 762:	86 e0       	ldi	r24, 0x06	; 6
+ 764:	09 95       	icall
+	(*clear_pin_ptr)(7);
+ 766:	e0 91 62 00 	lds	r30, 0x0062	; 0x800062 <clear_pin_ptr>
+ 76a:	f0 91 63 00 	lds	r31, 0x0063	; 0x800063 <clear_pin_ptr+0x1>
+ 76e:	87 e0       	ldi	r24, 0x07	; 7
+ 770:	09 95       	icall
+
+	//end midi learn mode in MIDI RX ISR
+	
+	return;
+ 772:	02 c0       	rjmp	.+4      	; 0x778 <midi_learn+0x234>
+/*						 MIDI LEARN			                            */
+/************************************************************************/
+
+
+void midi_learn(void)
+{	
+ 774:	00 e0       	ldi	r16, 0x00	; 0
+ 776:	74 cf       	rjmp	.-280    	; 0x660 <midi_learn+0x11c>
+
+	//end midi learn mode in MIDI RX ISR
+	
+	return;
+	
+}
+ 778:	df 91       	pop	r29
+ 77a:	cf 91       	pop	r28
+ 77c:	1f 91       	pop	r17
+ 77e:	0f 91       	pop	r16
+ 780:	ff 90       	pop	r15
+ 782:	ef 90       	pop	r14
+ 784:	df 90       	pop	r13
+ 786:	cf 90       	pop	r12
+ 788:	08 95       	ret
+
+0000078a <main>:
+int main(void)
+{
+
+/* GPIO INIT */
+	//DDRA = 0xFF; //ROW&COLUMN FOR LED/BUTTON	
+	DDRC = 0x0C | (1 << LED_pin) | (1 << BUTTON_PIN); //LDAC & CLEAR & LED
+ 78a:	8f e0       	ldi	r24, 0x0F	; 15
+ 78c:	84 bb       	out	0x14, r24	; 20
+	DDRB = 0x01; // Trigger Out 0	
+ 78e:	81 e0       	ldi	r24, 0x01	; 1
+ 790:	87 bb       	out	0x17, r24	; 23
+	DDRD = 0xFE; //Trigger outs 1-7
+ 792:	8e ef       	ldi	r24, 0xFE	; 254
+ 794:	81 bb       	out	0x11, r24	; 17
+	//DDRE = 0xFC; //ENABLE outs 7-2
+	//DDRG = 0x03; //ENABLE outs 1,0
+    //DDRF = 0x0C; // 0,1 Button Ins 2,3 Clock outs 
+   
+	//PORTC |= (1 << BUTTON_PIN);
+    PORTD |= 0xFE; //ALL GATES LOW (Inverter Out)
+ 796:	82 b3       	in	r24, 0x12	; 18
+ 798:	8e 6f       	ori	r24, 0xFE	; 254
+ 79a:	82 bb       	out	0x12, r24	; 18
+    PORTB |= 0x01; // 
+ 79c:	c0 9a       	sbi	0x18, 0	; 24
+	
+	set_LED(ENABLE);
+ 79e:	81 e0       	ldi	r24, 0x01	; 1
+ 7a0:	c2 de       	rcall	.-636    	; 0x526 <set_LED>
+	#else
+		//round up by default
+		__ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
+	#endif
+
+	__builtin_avr_delay_cycles(__ticks_dc);
+ 7a2:	2f ef       	ldi	r18, 0xFF	; 255
+ 7a4:	85 ea       	ldi	r24, 0xA5	; 165
+ 7a6:	9e e0       	ldi	r25, 0x0E	; 14
+ 7a8:	21 50       	subi	r18, 0x01	; 1
+ 7aa:	80 40       	sbci	r24, 0x00	; 0
+ 7ac:	90 40       	sbci	r25, 0x00	; 0
+ 7ae:	e1 f7       	brne	.-8      	; 0x7a8 <main+0x1e>
+ 7b0:	00 c0       	rjmp	.+0      	; 0x7b2 <main+0x28>
+ 7b2:	00 00       	nop
+	_delay_ms(300);
+	set_LED(DISABLE);
+ 7b4:	80 e0       	ldi	r24, 0x00	; 0
+ 7b6:	b7 de       	rcall	.-658    	; 0x526 <set_LED>
+
+	#define BUTTONFIXVARIABLE (uint8_t *) 0x07
+	//THIS PART IS FOR HARDWARE VERSION 1.5 and up so Code is backwards compatible
+	uint8_t buttonfix_flag = 0;
+
+	do {} while (!eeprom_is_ready());
+ 7b8:	e1 99       	sbic	0x1c, 1	; 28
+ 7ba:	fe cf       	rjmp	.-4      	; 0x7b8 <main+0x2e>
+	//load Channel
+	buttonfix_flag = eeprom_read_byte(BUTTONFIXVARIABLE);
+ 7bc:	87 e0       	ldi	r24, 0x07	; 7
+ 7be:	90 e0       	ldi	r25, 0x00	; 0
+ 7c0:	46 d1       	rcall	.+652    	; 0xa4e <eeprom_read_byte>
+
+	if (buttonfix_flag == 0xAA)
+ 7c2:	8a 3a       	cpi	r24, 0xAA	; 170
+ 7c4:	09 f4       	brne	.+2      	; 0x7c8 <main+0x3e>
+	{
+		DDRC &= ~((1 << BUTTON_PIN));//INPUT
+ 7c6:	a1 98       	cbi	0x14, 1	; 20
+	//buttons = { {BUTTON_UP,BUTTON_UP,BUTTON_UP,BUTTON_UP,BUTTON_UP,BUTTON_UP,BUTTON_UP,BUTTON_UP},BUTTON_UP,BUTTON_UP };	
+				
+	/* Blink Timer Init */
+//	TCCR1B = 0b010; //FREE RUNNING, PORT disconnected, /64
+	/* Button Poll Timer */
+	TCCR2 = (1 << WGM20)|(0 << WGM21)|(0b111<<CS20);//CTC, PORT disconnected, /1024
+ 7c8:	87 e4       	ldi	r24, 0x47	; 71
+ 7ca:	85 bd       	out	0x25, r24	; 37
+	OCR2 = 157;//ca. 10ms@16MHz
+ 7cc:	8d e9       	ldi	r24, 0x9D	; 157
+ 7ce:	83 bd       	out	0x23, r24	; 35
+	
+	/* MIDI INIT */
+	UCSRB = (1<<RXCIE)|(1<<RXEN);
+ 7d0:	80 e9       	ldi	r24, 0x90	; 144
+ 7d2:	8a b9       	out	0x0a, r24	; 10
+	UCSRC = (1<<UCSZ0)|(1<<UCSZ1);
+ 7d4:	86 e0       	ldi	r24, 0x06	; 6
+ 7d6:	80 bd       	out	0x20, r24	; 32
+	UBRRH = (unsigned char)(MYUBRR>>8);
+ 7d8:	10 bc       	out	0x20, r1	; 32
+	UBRRL = (unsigned char) MYUBRR;
+ 7da:	8f e1       	ldi	r24, 0x1F	; 31
+ 7dc:	89 b9       	out	0x09, r24	; 9
+	
+/* LOAD MIDI MAP FROM EEPROM*/
+	do {} while (!eeprom_is_ready());
+ 7de:	e1 99       	sbic	0x1c, 1	; 28
+ 7e0:	fe cf       	rjmp	.-4      	; 0x7de <main+0x54>
+	//load Channel 
+	midi_channel = eeprom_read_byte(EEPROM_CHANNEL_ADDR);
+ 7e2:	80 e0       	ldi	r24, 0x00	; 0
+ 7e4:	91 e0       	ldi	r25, 0x01	; 1
+ 7e6:	33 d1       	rcall	.+614    	; 0xa4e <eeprom_read_byte>
+ 7e8:	80 93 67 00 	sts	0x0067, r24	; 0x800067 <midi_channel>
+	do {} while (!eeprom_is_ready());
+ 7ec:	e1 99       	sbic	0x1c, 1	; 28
+ 7ee:	fe cf       	rjmp	.-4      	; 0x7ec <main+0x62>
+	//load map
+	eeprom_read_block(&midi_note_map,EEPROM_MAP_ADDR,8);	
+ 7f0:	48 e0       	ldi	r20, 0x08	; 8
+ 7f2:	50 e0       	ldi	r21, 0x00	; 0
+ 7f4:	61 e0       	ldi	r22, 0x01	; 1
+ 7f6:	71 e0       	ldi	r23, 0x01	; 1
+ 7f8:	80 e7       	ldi	r24, 0x70	; 112
+ 7fa:	90 e0       	ldi	r25, 0x00	; 0
+ 7fc:	18 d1       	rcall	.+560    	; 0xa2e <eeprom_read_block>
+	do {} while (!eeprom_is_ready());
+ 7fe:	e1 99       	sbic	0x1c, 1	; 28
+ 800:	fe cf       	rjmp	.-4      	; 0x7fe <main+0x74>
+	//load Channel
+	module_mode = eeprom_read_byte(EEPROM_MODE_ADDR);	
+ 802:	80 e1       	ldi	r24, 0x10	; 16
+ 804:	91 e0       	ldi	r25, 0x01	; 1
+ 806:	23 d1       	rcall	.+582    	; 0xa4e <eeprom_read_byte>
+ 808:	80 93 66 00 	sts	0x0066, r24	; 0x800066 <module_mode>
+	
+	
+	
+	do {} while (!eeprom_is_ready());
+ 80c:	e1 99       	sbic	0x1c, 1	; 28
+ 80e:	fe cf       	rjmp	.-4      	; 0x80c <main+0x82>
+	//set map to default if never learned:
+	if (midi_note_map[0]==0xFF)
+ 810:	80 91 70 00 	lds	r24, 0x0070	; 0x800070 <midi_note_map>
+ 814:	8f 3f       	cpi	r24, 0xFF	; 255
+ 816:	09 f4       	brne	.+2      	; 0x81a <main+0x90>
+		set_default();
+ 818:	37 dd       	rcall	.-1426   	; 0x288 <set_default>
+
+	
+/* CHECK FOR EXPANDERS */
+	//uint8_t i2cread[5] = {NULL};
+	//TWI_READ_BULK(0x20,0x00,2,&i2cread);
+	PORTC = (1 << PC2)|(1 << PC3);	
+ 81a:	8c e0       	ldi	r24, 0x0C	; 12
+ 81c:	85 bb       	out	0x15, r24	; 21
+	DDRC  |= (1 << PC2)|(1 << PC3);
+ 81e:	84 b3       	in	r24, 0x14	; 20
+ 820:	8c 60       	ori	r24, 0x0C	; 12
+ 822:	84 bb       	out	0x14, r24	; 20
+	
+	velocity_out = test_max5825();	//Velocity Out Expander present? (a.k.a. WK4) 
+ 824:	db d0       	rcall	.+438    	; 0x9dc <test_max5825>
+ 826:	80 93 80 01 	sts	0x0180, r24	; 0x800180 <velocity_out>
+//	if(velocity_out){
+		init_max5825();
+ 82a:	be d0       	rcall	.+380    	; 0x9a8 <init_max5825>
+		init_max5825();		
+ 82c:	bd d0       	rcall	.+378    	; 0x9a8 <init_max5825>
+//		max5825_set_load_channel(0,0xFfff);
+//	}
+
+	//GET HARDWARE REVISION
+	PORTB |= (1 << PB1); //PULLUP
+ 82e:	c1 9a       	sbi	0x18, 1	; 24
+	DDRB &= ~(1 << PB1); //INPUT
+ 830:	b9 98       	cbi	0x17, 1	; 23
+ 832:	2f ef       	ldi	r18, 0xFF	; 255
+ 834:	81 ee       	ldi	r24, 0xE1	; 225
+ 836:	94 e0       	ldi	r25, 0x04	; 4
+ 838:	21 50       	subi	r18, 0x01	; 1
+ 83a:	80 40       	sbci	r24, 0x00	; 0
+ 83c:	90 40       	sbci	r25, 0x00	; 0
+ 83e:	e1 f7       	brne	.-8      	; 0x838 <main+0xae>
+ 840:	00 c0       	rjmp	.+0      	; 0x842 <main+0xb8>
+ 842:	00 00       	nop
+	_delay_ms(100);
+	
+	if ((PINB >> PB1) &1){
+ 844:	b1 9b       	sbis	0x16, 1	; 22
+ 846:	0d c0       	rjmp	.+26     	; 0x862 <main+0xd8>
+		//OLD HARDWARE
+		//SET PINS INVERSE
+		set_pin_ptr = & set_pin_inv;
+ 848:	84 e1       	ldi	r24, 0x14	; 20
+ 84a:	91 e0       	ldi	r25, 0x01	; 1
+ 84c:	90 93 65 00 	sts	0x0065, r25	; 0x800065 <set_pin_ptr+0x1>
+ 850:	80 93 64 00 	sts	0x0064, r24	; 0x800064 <set_pin_ptr>
+		clear_pin_ptr = & clear_pin_inv;
+ 854:	8c e2       	ldi	r24, 0x2C	; 44
+ 856:	91 e0       	ldi	r25, 0x01	; 1
+ 858:	90 93 63 00 	sts	0x0063, r25	; 0x800063 <clear_pin_ptr+0x1>
+ 85c:	80 93 62 00 	sts	0x0062, r24	; 0x800062 <clear_pin_ptr>
+ 860:	0c c0       	rjmp	.+24     	; 0x87a <main+0xf0>
+		
+		} else {
+		//NEW HARDWARE - PIN TO GND
+		//SET PINS NORMAL
+		set_pin_ptr = & clear_pin_inv;
+ 862:	8c e2       	ldi	r24, 0x2C	; 44
+ 864:	91 e0       	ldi	r25, 0x01	; 1
+ 866:	90 93 65 00 	sts	0x0065, r25	; 0x800065 <set_pin_ptr+0x1>
+ 86a:	80 93 64 00 	sts	0x0064, r24	; 0x800064 <set_pin_ptr>
+		clear_pin_ptr = & set_pin_inv;
+ 86e:	84 e1       	ldi	r24, 0x14	; 20
+ 870:	91 e0       	ldi	r25, 0x01	; 1
+ 872:	90 93 63 00 	sts	0x0063, r25	; 0x800063 <clear_pin_ptr+0x1>
+ 876:	80 93 62 00 	sts	0x0062, r24	; 0x800062 <clear_pin_ptr>
+	}
+
+		(*clear_pin_ptr)(0);
+ 87a:	e0 91 62 00 	lds	r30, 0x0062	; 0x800062 <clear_pin_ptr>
+ 87e:	f0 91 63 00 	lds	r31, 0x0063	; 0x800063 <clear_pin_ptr+0x1>
+ 882:	80 e0       	ldi	r24, 0x00	; 0
+ 884:	09 95       	icall
+		(*clear_pin_ptr)(1);
+ 886:	e0 91 62 00 	lds	r30, 0x0062	; 0x800062 <clear_pin_ptr>
+ 88a:	f0 91 63 00 	lds	r31, 0x0063	; 0x800063 <clear_pin_ptr+0x1>
+ 88e:	81 e0       	ldi	r24, 0x01	; 1
+ 890:	09 95       	icall
+		(*clear_pin_ptr)(2);
+ 892:	e0 91 62 00 	lds	r30, 0x0062	; 0x800062 <clear_pin_ptr>
+ 896:	f0 91 63 00 	lds	r31, 0x0063	; 0x800063 <clear_pin_ptr+0x1>
+ 89a:	82 e0       	ldi	r24, 0x02	; 2
+ 89c:	09 95       	icall
+		(*clear_pin_ptr)(3);
+ 89e:	e0 91 62 00 	lds	r30, 0x0062	; 0x800062 <clear_pin_ptr>
+ 8a2:	f0 91 63 00 	lds	r31, 0x0063	; 0x800063 <clear_pin_ptr+0x1>
+ 8a6:	83 e0       	ldi	r24, 0x03	; 3
+ 8a8:	09 95       	icall
+		(*clear_pin_ptr)(4);
+ 8aa:	e0 91 62 00 	lds	r30, 0x0062	; 0x800062 <clear_pin_ptr>
+ 8ae:	f0 91 63 00 	lds	r31, 0x0063	; 0x800063 <clear_pin_ptr+0x1>
+ 8b2:	84 e0       	ldi	r24, 0x04	; 4
+ 8b4:	09 95       	icall
+		(*clear_pin_ptr)(5);
+ 8b6:	e0 91 62 00 	lds	r30, 0x0062	; 0x800062 <clear_pin_ptr>
+ 8ba:	f0 91 63 00 	lds	r31, 0x0063	; 0x800063 <clear_pin_ptr+0x1>
+ 8be:	85 e0       	ldi	r24, 0x05	; 5
+ 8c0:	09 95       	icall
+		(*clear_pin_ptr)(6);
+ 8c2:	e0 91 62 00 	lds	r30, 0x0062	; 0x800062 <clear_pin_ptr>
+ 8c6:	f0 91 63 00 	lds	r31, 0x0063	; 0x800063 <clear_pin_ptr+0x1>
+ 8ca:	86 e0       	ldi	r24, 0x06	; 6
+ 8cc:	09 95       	icall
+		(*clear_pin_ptr)(7);
+ 8ce:	e0 91 62 00 	lds	r30, 0x0062	; 0x800062 <clear_pin_ptr>
+ 8d2:	f0 91 63 00 	lds	r31, 0x0063	; 0x800063 <clear_pin_ptr+0x1>
+ 8d6:	87 e0       	ldi	r24, 0x07	; 7
+ 8d8:	09 95       	icall
+
+
+	midi_learn_mode = 0;
+ 8da:	10 92 82 01 	sts	0x0182, r1	; 0x800182 <midi_learn_mode>
+/* INTERRUPTS ENABLE */
+	sei();
+ 8de:	78 94       	sei
+		if(setting_wait_flag == 1){
+			if (setting_wait_counter >=200){
+			//	set_LED(ENABLE);
+				setting_wait_counter = 0;
+				setting_wait_flag = 0;				
+				learn_button = BUTTON_UP;
+ 8e0:	c1 e0       	ldi	r28, 0x01	; 1
+		learn_button = BUTTON_UP;
+	//	set_LED(DISABLE);
+	}
+
+	if (learn_button == BUTTON_PRESSED){
+		learn_button = BUTTON_DOWN;
+ 8e2:	d2 e0       	ldi	r29, 0x02	; 2
+					
+					if(button_now == 0){
+						learn_button = BUTTON_RELEASED;
+						//set_LED(DISABLE);
+					}else{
+						learn_button = BUTTON_PRESSED;		
+ 8e4:	03 e0       	ldi	r16, 0x03	; 3
+			}else{			
+										
+				if (button_now != button_last){			
+					
+					if(button_now == 0){
+						learn_button = BUTTON_RELEASED;
+ 8e6:	14 e0       	ldi	r17, 0x04	; 4
+	static uint8_t button_bounce = 0;
+	static uint8_t button_last = 0;
+	
+
+	//CHECK FOR GOTO SETTINGS MENU - LEARN BUTTON HAS TO BE DOWN FOR 3 SEC 
+	if ((learn_button == BUTTON_RELEASED)){
+ 8e8:	80 91 61 00 	lds	r24, 0x0061	; 0x800061 <learn_button.2187>
+ 8ec:	84 30       	cpi	r24, 0x04	; 4
+ 8ee:	49 f4       	brne	.+18     	; 0x902 <main+0x178>
+		setting_wait_counter = 0;
+ 8f0:	10 92 7f 01 	sts	0x017F, r1	; 0x80017f <setting_wait_counter+0x1>
+ 8f4:	10 92 7e 01 	sts	0x017E, r1	; 0x80017e <setting_wait_counter>
+		setting_wait_flag = 0;
+ 8f8:	10 92 7d 01 	sts	0x017D, r1	; 0x80017d <setting_wait_flag>
+		learn_button = BUTTON_UP;
+ 8fc:	c0 93 61 00 	sts	0x0061, r28	; 0x800061 <learn_button.2187>
+ 900:	27 c0       	rjmp	.+78     	; 0x950 <main+0x1c6>
+	//	set_LED(DISABLE);
+	}
+
+	if (learn_button == BUTTON_PRESSED){
+ 902:	83 30       	cpi	r24, 0x03	; 3
+ 904:	69 f4       	brne	.+26     	; 0x920 <main+0x196>
+		learn_button = BUTTON_DOWN;
+ 906:	d0 93 61 00 	sts	0x0061, r29	; 0x800061 <learn_button.2187>
+		//set_LED(ENABLE);		
+		if(setting_wait_flag == 0){	//START THE WAIT
+ 90a:	80 91 7d 01 	lds	r24, 0x017D	; 0x80017d <setting_wait_flag>
+ 90e:	81 11       	cpse	r24, r1
+ 910:	0b c0       	rjmp	.+22     	; 0x928 <main+0x19e>
+			setting_wait_counter = 0;
+ 912:	10 92 7f 01 	sts	0x017F, r1	; 0x80017f <setting_wait_counter+0x1>
+ 916:	10 92 7e 01 	sts	0x017E, r1	; 0x80017e <setting_wait_counter>
+			setting_wait_flag = 1;
+ 91a:	c0 93 7d 01 	sts	0x017D, r28	; 0x80017d <setting_wait_flag>
+ 91e:	08 c0       	rjmp	.+16     	; 0x930 <main+0x1a6>
+			//LEDs.groupLED = LED_BLINK2;
+
+		}
+	}
+		
+	if(learn_button == BUTTON_DOWN){
+ 920:	80 91 61 00 	lds	r24, 0x0061	; 0x800061 <learn_button.2187>
+ 924:	82 30       	cpi	r24, 0x02	; 2
+ 926:	a1 f4       	brne	.+40     	; 0x950 <main+0x1c6>
+		if(setting_wait_flag == 1){
+ 928:	80 91 7d 01 	lds	r24, 0x017D	; 0x80017d <setting_wait_flag>
+ 92c:	81 30       	cpi	r24, 0x01	; 1
+ 92e:	81 f4       	brne	.+32     	; 0x950 <main+0x1c6>
+			if (setting_wait_counter >=200){
+ 930:	80 91 7e 01 	lds	r24, 0x017E	; 0x80017e <setting_wait_counter>
+ 934:	90 91 7f 01 	lds	r25, 0x017F	; 0x80017f <setting_wait_counter+0x1>
+ 938:	88 3c       	cpi	r24, 0xC8	; 200
+ 93a:	91 05       	cpc	r25, r1
+ 93c:	48 f0       	brcs	.+18     	; 0x950 <main+0x1c6>
+			//	set_LED(ENABLE);
+				setting_wait_counter = 0;
+ 93e:	10 92 7f 01 	sts	0x017F, r1	; 0x80017f <setting_wait_counter+0x1>
+ 942:	10 92 7e 01 	sts	0x017E, r1	; 0x80017e <setting_wait_counter>
+				setting_wait_flag = 0;				
+ 946:	10 92 7d 01 	sts	0x017D, r1	; 0x80017d <setting_wait_flag>
+				learn_button = BUTTON_UP;
+ 94a:	c0 93 61 00 	sts	0x0061, r28	; 0x800061 <learn_button.2187>
+				midi_learn();			
+ 94e:	fa dd       	rcall	.-1036   	; 0x544 <midi_learn>
+	
+
+	/************************************************************************/
+	/*                    keyscan                                           */
+	/************************************************************************/
+		if ((TIFR>>OCF2)&1)
+ 950:	08 b6       	in	r0, 0x38	; 56
+ 952:	07 fe       	sbrs	r0, 7
+ 954:	c9 cf       	rjmp	.-110    	; 0x8e8 <main+0x15e>
+		{
+			//keyscan(&buttons);
+			TCNT2 = 0; //reset timer
+ 956:	14 bc       	out	0x24, r1	; 36
+			TIFR |= (1 << OCF2); //reset flag		
+ 958:	88 b7       	in	r24, 0x38	; 56
+ 95a:	80 68       	ori	r24, 0x80	; 128
+ 95c:	88 bf       	out	0x38, r24	; 56
+			
+			button_now = PINC & (1 << BUTTON_PIN);
+ 95e:	83 b3       	in	r24, 0x13	; 19
+ 960:	82 70       	andi	r24, 0x02	; 2
+			
+			if (button_now != button_bounce){
+ 962:	90 91 7c 01 	lds	r25, 0x017C	; 0x80017c <button_bounce.2189>
+ 966:	89 17       	cp	r24, r25
+ 968:	19 f0       	breq	.+6      	; 0x970 <main+0x1e6>
+				button_bounce = button_now;			
+ 96a:	80 93 7c 01 	sts	0x017C, r24	; 0x80017c <button_bounce.2189>
+ 96e:	0d c0       	rjmp	.+26     	; 0x98a <main+0x200>
+			}else{			
+										
+				if (button_now != button_last){			
+ 970:	90 91 7b 01 	lds	r25, 0x017B	; 0x80017b <button_last.2190>
+ 974:	89 17       	cp	r24, r25
+ 976:	49 f0       	breq	.+18     	; 0x98a <main+0x200>
+					
+					if(button_now == 0){
+ 978:	81 11       	cpse	r24, r1
+ 97a:	03 c0       	rjmp	.+6      	; 0x982 <main+0x1f8>
+						learn_button = BUTTON_RELEASED;
+ 97c:	10 93 61 00 	sts	0x0061, r17	; 0x800061 <learn_button.2187>
+ 980:	02 c0       	rjmp	.+4      	; 0x986 <main+0x1fc>
+						//set_LED(DISABLE);
+					}else{
+						learn_button = BUTTON_PRESSED;		
+ 982:	00 93 61 00 	sts	0x0061, r16	; 0x800061 <learn_button.2187>
+					//	set_LED(ENABLE);
+					}
+						
+					button_last = button_now;		
+ 986:	80 93 7b 01 	sts	0x017B, r24	; 0x80017b <button_last.2190>
+				}			
+			}
+
+			if(setting_wait_flag == 1)
+ 98a:	80 91 7d 01 	lds	r24, 0x017D	; 0x80017d <setting_wait_flag>
+ 98e:	81 30       	cpi	r24, 0x01	; 1
+ 990:	09 f0       	breq	.+2      	; 0x994 <main+0x20a>
+ 992:	aa cf       	rjmp	.-172    	; 0x8e8 <main+0x15e>
+				setting_wait_counter++; 
+ 994:	80 91 7e 01 	lds	r24, 0x017E	; 0x80017e <setting_wait_counter>
+ 998:	90 91 7f 01 	lds	r25, 0x017F	; 0x80017f <setting_wait_counter+0x1>
+ 99c:	01 96       	adiw	r24, 0x01	; 1
+ 99e:	90 93 7f 01 	sts	0x017F, r25	; 0x80017f <setting_wait_counter+0x1>
+ 9a2:	80 93 7e 01 	sts	0x017E, r24	; 0x80017e <setting_wait_counter>
+ 9a6:	a0 cf       	rjmp	.-192    	; 0x8e8 <main+0x15e>
+
+000009a8 <init_max5825>:
+
+#include <avr/io.h>
+#include "MAX5825.h"
+#include "general_twi.h"
+
+void init_max5825(void){
+ 9a8:	cf 93       	push	r28
+ 9aa:	df 93       	push	r29
+ 9ac:	00 d0       	rcall	.+0      	; 0x9ae <init_max5825+0x6>
+ 9ae:	cd b7       	in	r28, 0x3d	; 61
+ 9b0:	de b7       	in	r29, 0x3e	; 62
+		
+	
+
+	uint8_t data[2] = {0};
+ 9b2:	1a 82       	std	Y+2, r1	; 0x02
+ 9b4:	19 82       	std	Y+1, r1	; 0x01
+	TWI_WRITE_BULK(MAX5825_ADDR,(MAX5825_REG_REF | 0b101),2,&data); //INT REF = 2.5V ALL DAC PWR ON 	
+ 9b6:	9e 01       	movw	r18, r28
+ 9b8:	2f 5f       	subi	r18, 0xFF	; 255
+ 9ba:	3f 4f       	sbci	r19, 0xFF	; 255
+ 9bc:	42 e0       	ldi	r20, 0x02	; 2
+ 9be:	65 e2       	ldi	r22, 0x25	; 37
+ 9c0:	80 e2       	ldi	r24, 0x20	; 32
+ 9c2:	e4 db       	rcall	.-2104   	; 0x18c <TWI_WRITE_BULK>
+		
+	TWI_WRITE_BULK(MAX5825_ADDR,MAX5825_REG_CODELOADALL,2,&data); // all to zero 
+ 9c4:	9e 01       	movw	r18, r28
+ 9c6:	2f 5f       	subi	r18, 0xFF	; 255
+ 9c8:	3f 4f       	sbci	r19, 0xFF	; 255
+ 9ca:	42 e0       	ldi	r20, 0x02	; 2
+ 9cc:	62 ec       	ldi	r22, 0xC2	; 194
+ 9ce:	80 e2       	ldi	r24, 0x20	; 32
+ 9d0:	dd db       	rcall	.-2118   	; 0x18c <TWI_WRITE_BULK>
+		
+	
+	return;
+}
+ 9d2:	0f 90       	pop	r0
+ 9d4:	0f 90       	pop	r0
+ 9d6:	df 91       	pop	r29
+ 9d8:	cf 91       	pop	r28
+ 9da:	08 95       	ret
+
+000009dc <test_max5825>:
+
+uint8_t test_max5825(void){
+ 9dc:	cf 93       	push	r28
+ 9de:	df 93       	push	r29
+ 9e0:	00 d0       	rcall	.+0      	; 0x9e2 <test_max5825+0x6>
+ 9e2:	cd b7       	in	r28, 0x3d	; 61
+ 9e4:	de b7       	in	r29, 0x3e	; 62
+	uint8_t retval = 0;
+	uint8_t buffer[2] = {0};
+ 9e6:	1a 82       	std	Y+2, r1	; 0x02
+ 9e8:	19 82       	std	Y+1, r1	; 0x01
+	
+	retval = TWI_READ_BULK(MAX5825_ADDR,0,2,&buffer);
+ 9ea:	9e 01       	movw	r18, r28
+ 9ec:	2f 5f       	subi	r18, 0xFF	; 255
+ 9ee:	3f 4f       	sbci	r19, 0xFF	; 255
+ 9f0:	42 e0       	ldi	r20, 0x02	; 2
+ 9f2:	60 e0       	ldi	r22, 0x00	; 0
+ 9f4:	80 e2       	ldi	r24, 0x20	; 32
+ 9f6:	4b db       	rcall	.-2410   	; 0x8e <TWI_READ_BULK>
+	
+	return retval;
+}
+ 9f8:	0f 90       	pop	r0
+ 9fa:	0f 90       	pop	r0
+ 9fc:	df 91       	pop	r29
+ 9fe:	cf 91       	pop	r28
+ a00:	08 95       	ret
+
+00000a02 <max5825_set_load_channel>:
+
+
+void max5825_set_load_channel(uint8_t ch, uint16_t value){
+ a02:	cf 93       	push	r28
+ a04:	df 93       	push	r29
+ a06:	00 d0       	rcall	.+0      	; 0xa08 <max5825_set_load_channel+0x6>
+ a08:	cd b7       	in	r28, 0x3d	; 61
+ a0a:	de b7       	in	r29, 0x3e	; 62
+	
+	uint8_t cmd_addr = (MAX5825_REG_CODEn_LOADn | (ch & 0x0F));
+	uint8_t data[2];
+	
+	data[0]= (uint8_t) ((value>>8) & 0xFF);
+ a0c:	79 83       	std	Y+1, r23	; 0x01
+	data[1]= (uint8_t) (value & 0x00F0);
+ a0e:	60 7f       	andi	r22, 0xF0	; 240
+ a10:	6a 83       	std	Y+2, r22	; 0x02
+
+	TWI_WRITE_BULK(MAX5825_ADDR,cmd_addr,2,&data);
+ a12:	8f 70       	andi	r24, 0x0F	; 15
+ a14:	68 2f       	mov	r22, r24
+ a16:	60 6b       	ori	r22, 0xB0	; 176
+ a18:	9e 01       	movw	r18, r28
+ a1a:	2f 5f       	subi	r18, 0xFF	; 255
+ a1c:	3f 4f       	sbci	r19, 0xFF	; 255
+ a1e:	42 e0       	ldi	r20, 0x02	; 2
+ a20:	80 e2       	ldi	r24, 0x20	; 32
+ a22:	b4 db       	rcall	.-2200   	; 0x18c <TWI_WRITE_BULK>
+	
+	return;
+ a24:	0f 90       	pop	r0
+ a26:	0f 90       	pop	r0
+ a28:	df 91       	pop	r29
+ a2a:	cf 91       	pop	r28
+ a2c:	08 95       	ret
+
+00000a2e <eeprom_read_block>:
+ a2e:	dc 01       	movw	r26, r24
+ a30:	cb 01       	movw	r24, r22
+
+00000a32 <eeprom_read_blraw>:
+ a32:	fc 01       	movw	r30, r24
+ a34:	e1 99       	sbic	0x1c, 1	; 28
+ a36:	fe cf       	rjmp	.-4      	; 0xa34 <eeprom_read_blraw+0x2>
+ a38:	06 c0       	rjmp	.+12     	; 0xa46 <eeprom_read_blraw+0x14>
+ a3a:	ff bb       	out	0x1f, r31	; 31
+ a3c:	ee bb       	out	0x1e, r30	; 30
+ a3e:	e0 9a       	sbi	0x1c, 0	; 28
+ a40:	31 96       	adiw	r30, 0x01	; 1
+ a42:	0d b2       	in	r0, 0x1d	; 29
+ a44:	0d 92       	st	X+, r0
+ a46:	41 50       	subi	r20, 0x01	; 1
+ a48:	50 40       	sbci	r21, 0x00	; 0
+ a4a:	b8 f7       	brcc	.-18     	; 0xa3a <eeprom_read_blraw+0x8>
+ a4c:	08 95       	ret
+
+00000a4e <eeprom_read_byte>:
+ a4e:	e1 99       	sbic	0x1c, 1	; 28
+ a50:	fe cf       	rjmp	.-4      	; 0xa4e <eeprom_read_byte>
+ a52:	9f bb       	out	0x1f, r25	; 31
+ a54:	8e bb       	out	0x1e, r24	; 30
+ a56:	e0 9a       	sbi	0x1c, 0	; 28
+ a58:	99 27       	eor	r25, r25
+ a5a:	8d b3       	in	r24, 0x1d	; 29
+ a5c:	08 95       	ret
+
+00000a5e <eeprom_write_block>:
+ a5e:	dc 01       	movw	r26, r24
+ a60:	cb 01       	movw	r24, r22
+ a62:	02 c0       	rjmp	.+4      	; 0xa68 <eeprom_write_block+0xa>
+ a64:	2d 91       	ld	r18, X+
+ a66:	05 d0       	rcall	.+10     	; 0xa72 <eeprom_write_r18>
+ a68:	41 50       	subi	r20, 0x01	; 1
+ a6a:	50 40       	sbci	r21, 0x00	; 0
+ a6c:	d8 f7       	brcc	.-10     	; 0xa64 <eeprom_write_block+0x6>
+ a6e:	08 95       	ret
+
+00000a70 <eeprom_write_byte>:
+ a70:	26 2f       	mov	r18, r22
+
+00000a72 <eeprom_write_r18>:
+ a72:	e1 99       	sbic	0x1c, 1	; 28
+ a74:	fe cf       	rjmp	.-4      	; 0xa72 <eeprom_write_r18>
+ a76:	9f bb       	out	0x1f, r25	; 31
+ a78:	8e bb       	out	0x1e, r24	; 30
+ a7a:	2d bb       	out	0x1d, r18	; 29
+ a7c:	0f b6       	in	r0, 0x3f	; 63
+ a7e:	f8 94       	cli
+ a80:	e2 9a       	sbi	0x1c, 2	; 28
+ a82:	e1 9a       	sbi	0x1c, 1	; 28
+ a84:	0f be       	out	0x3f, r0	; 63
+ a86:	01 96       	adiw	r24, 0x01	; 1
+ a88:	08 95       	ret
+
+00000a8a <_exit>:
+ a8a:	f8 94       	cli
+
+00000a8c <__stop_program>:
+ a8c:	ff cf       	rjmp	.-2      	; 0xa8c <__stop_program>
