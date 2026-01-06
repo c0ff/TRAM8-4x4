@@ -88,6 +88,8 @@ void timer_init(void) {
 /* state globals */
 //uint16_t clock_tick = 0;
 
+// --- Gate outputs config
+
 enum GateFlags {
     GateMode_Gate = 0,
     GateMode_Trigger = 1,
@@ -98,14 +100,6 @@ enum GateFlags {
     GateSource_MASK = 0xFE,
 };
 
-enum VoltageFlags {
-    VoltageSource_Note = 0,
-    VoltageSource_ControlChange = 0x80,
-    VoltageSource_MASK = 0x80,
-    
-    VoltageSource_Number_MASK = 0x7F,
-};
-
 struct GateState {
     uint8_t flags;
     uint8_t param;
@@ -114,7 +108,25 @@ struct GateState {
         uint8_t current_output;
     };
     uint8_t midi_pulse_counter;
-} gates[8] = {
+};
+
+// --- CV outputs config
+
+enum VoltageFlags {
+    VoltageSource_Note = 0,
+    VoltageSource_ControlChange = 0x80,
+    VoltageSource_MASK = 0x80,
+    
+    VoltageSource_Number_MASK = 0x7F,
+};
+
+struct VoltageState {
+    uint8_t note_or_cc; // 0x00 | Note num or 0x80 | CC num
+};
+
+// --- default config settings
+
+struct GateState gates[8] = {
     {GateMode_Trigger | GateSource_Note, 36, {}, 0}, // TR-8S BD
     {GateMode_Trigger | GateSource_Note, 38, {}, 0}, // TR-8S SD
     {GateMode_Trigger | GateSource_Note, 42, {}, 0}, // TR-8S CH
@@ -125,9 +137,7 @@ struct GateState {
     {GateMode_Trigger | GateSource_Clock,  0, {}, 0}, // RESET trigger
 };
 
-struct VoltageState {
-    uint8_t note_or_cc; // 0x00 | Note num or 0x80 | CC num
-} voltages[8] = {
+struct VoltageState voltages[8] = {
     {VoltageSource_Note | 36}, // TR-8S BD
     {VoltageSource_Note | 38}, // TR-8S SD
     {VoltageSource_Note | 42}, // TR-8S CH
@@ -156,20 +166,9 @@ uint8_t midi_cmd_data[3];
 
 /* MIDI GLOBALS */
 
-//uint8_t midi_clock_tick_cntr=0;
-//uint8_t midi_quarter_cntr=0;
-//uint8_t midi_quarter_cntr_prev = 0;
-//uint8_t sync_counter_match = (1 << 2); //1=QRT 2=HLF 4=BAR 8=2BAR etc.
-//uint8_t wait_for_match = 0;
-//uint8_t boundary_led_flag = 0;
-//uint8_t group_hold = 0;
-
 uint8_t midi_note_map[8] = {60,61,62,63,64,65,66,67};
 uint8_t midi_note_map_default[8] = {60,61,62,63,64,65,66,67};
 
-//uint8_t midi_buff[3] = {0,0,0};
-//uint8_t midi_buff_point = 0;
-//uint8_t midi_buff_allowed = 0;
 uint8_t midi_channel = 9;
 uint8_t midi_learn_mode = 0;
 uint8_t midi_learn_current = 0;
@@ -180,25 +179,6 @@ uint8_t velocity_out = 0;
 
 uint16_t setting_wait_counter = 0;
 uint8_t setting_wait_flag = 0;
-
-//uint8_t start_clock_delay_flag = 0;
-
-//typedef struct {
-//uint8_t velocity_mute;
-//uint8_t clk_prescaler;
-//uint8_t reset_invert;
-//uint8_t midi_conv_en; 
-//} sys_presets;
-//
-//sys_presets presets = {DISABLE,DISABLE,DISABLE,ENABLE};
-
-
-///* LED INIT */
-//all_LED_struct LEDs = { {LED_ON,LED_ON,LED_ON,LED_ON,LED_ON,LED_ON,LED_ON,LED_ON},LED_OFF,LED_OFF,LED_OFF,LED_OFF };
-//uint8_t row_select = 1; 
-///* BUTTONS INIT */
-//all_buttons_struct buttons = { {BUTTON_UP,BUTTON_UP,BUTTON_UP,BUTTON_UP,BUTTON_UP,BUTTON_UP,BUTTON_UP,BUTTON_UP},BUTTON_UP,BUTTON_UP };
-//
 
 //POINTER MANIPULATION 
 void  (*set_pin_ptr)(uint8_t ) = & set_pin_inv;
