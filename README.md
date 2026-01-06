@@ -1,20 +1,27 @@
 # TRAM8 Module 4x4 Firmware
 
 Based on Stock Firmware 1.3
+
 Timer code for 1ms ticks from https://github.com/thorinf/tram8-plus/
 
+
 4x4 means:
-4 trigger outputs for notes 36, 38, 42, 46 which correspond to TR-8S BD, SD, CH, OH
-4 velocity CV outputs for these notes, 0-8V
-4 clock outputs: tripets, quarters, Run gate, Reset trigger
-4 CC to 0-8V CV for controllers 24, 29, 63, 82 which correspond to TR-8S BD, SD, CH, OH levels
+- 4 trigger outputs for notes 36, 38, 42, 46 which correspond to TR-8S BD, SD, CH, OH
+- 4 velocity CV outputs for these notes, 0-8V
+- 4 clock outputs: tripets, quarters, Run gate, Reset trigger
+- 4 CC to 0-8V CV for controllers 24, 29, 63, 82 which correspond to TR-8S BD, SD, CH, OH levels
 
 Firmware supports both gate and trigger outputs with custom ppqn, CC, and Note support.
+
 At the moment the configuration is hardcoded. An HTML-based SysEx editor is planned.
 
+
 Hacked by Dmitry Baikov.
+
 Built on MacOSX using avr-gcc and CMake.
+
 Tested with Squarp Hapax and Nano modules Octa
+
 
 Default configuration:
 
