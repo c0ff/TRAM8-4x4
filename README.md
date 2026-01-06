@@ -1,40 +1,46 @@
-# TRAM8 Module Firmware Hacking
+# TRAM8 Module 4x4 Firmware
 
-LPZW.modules TRAM8 Repository for Firmware Hacking
+Based on Stock Firmware 1.3
+Timer code for 1ms ticks from https://github.com/thorinf/tram8-plus/
 
-Convert the compiled hex file to SysEx with the Script in "HEX_2_SYX Formating". 
+4x4 means:
+4 trigger outputs for notes 36, 38, 42, 46 which correspond to TR-8S BD, SD, CH, OH
+4 velocity CV outputs for these notes, 0-8V
+4 clock outputs: tripets, quarters, Run gate, Reset trigger
+4 CC to 0-8V CV for controllers 24, 29, 63, 82 which correspond to TR-8S BD, SD, CH, OH levels
+
+Firmware supports both gate and trigger outputs with custom ppqn, CC, and Note support.
+At the moment the configuration is hardcoded. An HTML-based SysEx editor is planned.
+
+Hacked by Dmitry Baikov.
+Built on MacOSX using avr-gcc and CMake.
+Tested with Squarp Hapax and Nano modules Octa
+
+Default configuration:
+
+```c
+struct GateState gates[NUM_OUT_GATES] = {
+    {GateMode_Trigger | GateSource_Note, 36, {}, 0}, // TR-8S BD
+    {GateMode_Trigger | GateSource_Note, 38, {}, 0}, // TR-8S SD
+    {GateMode_Trigger | GateSource_Note, 42, {}, 0}, // TR-8S CH
+    {GateMode_Trigger | GateSource_Note, 46, {}, 0}, // TR-8S OH
+    {GateMode_Trigger | GateSource_Clock, 16, {}, 0}, // 2/3 ppqn
+    {GateMode_Trigger | GateSource_Clock, 24, {}, 0}, // 1 ppqn
+    {GateMode_Gate    | GateSource_Clock,  0, {}, 0}, // RUN gate
+    {GateMode_Trigger | GateSource_Clock,  0, {}, 0}, // RESET trigger
+};
+
+struct VoltageState voltages[NUM_OUT_VOLTAGES] = {
+    {VoltageSource_Note | 36}, // TR-8S BD
+    {VoltageSource_Note | 38}, // TR-8S SD
+    {VoltageSource_Note | 42}, // TR-8S CH
+    {VoltageSource_Note | 46}, // TR-8S OH
+    {VoltageSource_ControlChange | 24}, // TR-8S BD Level
+    {VoltageSource_ControlChange | 29}, // TR-8S SD Level
+    {VoltageSource_ControlChange | 63}, // TR-8S CH Level
+    {VoltageSource_ControlChange | 82}, // TR-8S OH Level
+};
 ```
-python .\hex_2_syx.py "Tram8.hex"
-```
-You'll need intelhex extension for python (.\.> pip3 intelhex)
-
-# Stock Firmware 
-8 Gates of the same MIDI Channel + Velocity of those notes or 8 fixed CCs of same channel
-
-V1.3 was necessary for the slight change on the learn button in HW1.5 - there is bodge fix (adding a pull down) not in the schematics
-
-
-# Clocks & Random:
-
-Gate Outputs:
-	1: Run signal - goes high with start low with stop
-	2: clock 24ppqn
-	3: clock 4ppqn aka 16th triggers.
-	4: 8th note trigger
-	5: clock 1ppqn aka quarter note triggers
-	6: half note shifted by a quarter (simple snare position)
-	7: beginning of bar pulse
-	8: 16th divided by 3 clock
-
-Velocity/CV Outputs:
-	1: random triggered each 16th
-	2: random triggered each 16th
-	3: brownian random triggered each 16th (drunken walk)
-	4: random triggered each quarter
-	5: random triggered each quarter
-	6: brownian random triggered each quarter (drunken walk)
-	7: random triggered each bar
-	8: 16th stepped ramp to go from 0-5V in a bar
 
 # CC BY-NC-ND 4.0 KAY KNOFE OF LPZW.modules
 
