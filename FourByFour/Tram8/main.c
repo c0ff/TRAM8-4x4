@@ -131,7 +131,7 @@ struct GateState gates[8] = {
     {GateMode_Trigger | GateSource_Note, 38, {}, 0}, // TR-8S SD
     {GateMode_Trigger | GateSource_Note, 42, {}, 0}, // TR-8S CH
     {GateMode_Trigger | GateSource_Note, 46, {}, 0}, // TR-8S OH
-    {GateMode_Trigger | GateSource_Clock,  6, {}, 0}, // 4 ppqn
+    {GateMode_Trigger | GateSource_Clock, 16, {}, 0}, // 2/3 ppqn
     {GateMode_Trigger | GateSource_Clock, 24, {}, 0}, // 1 ppqn
     {GateMode_Gate    | GateSource_Clock,  0, {}, 0}, // RUN gate
     {GateMode_Trigger | GateSource_Clock,  0, {}, 0}, // RESET trigger
@@ -805,7 +805,7 @@ void voltage_note_or_cc(uint8_t note_or_cc, uint8_t val)
     uint8_t i;
     for (i = 0; i < 8; ++i)
         if (voltages[i].note_or_cc == note_or_cc)
-            max5825_set_load_channel(7-i, velocity_lookup[val & 0x7F]);
+            max5825_set_load_channel(7 - i, velocity_lookup[val & 0x7F]);
 }
 
 void set_LED(uint8_t var){
