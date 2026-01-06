@@ -14,8 +14,8 @@ void init_max5825(void){
 	
 
 	uint8_t data[2] = {0};
-	TWI_WRITE_BULK(MAX5825_ADDR,(MAX5825_REG_REF | 0b101),2,&data); //INT REF = 2.5V ALL DAC PWR ON 	
-		
+	// INT REF 0b101 = 2.5V 0b111 = 4.1V ALL DAC PWR ON
+	TWI_WRITE_BULK(MAX5825_ADDR,(MAX5825_REG_REF | 0b111),2,&data);	
 	TWI_WRITE_BULK(MAX5825_ADDR,MAX5825_REG_CODELOADALL,2,&data); // all to zero 
 		
 	
