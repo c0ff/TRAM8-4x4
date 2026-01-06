@@ -9,27 +9,26 @@
 #ifndef MIDI_H_
 #define MIDI_H_
 
-#define MIDI_STATUS_bit 7
+enum MidiMagics {
+    MIDI_MSG_NOTE_OFF       = 0b10000000,
+    MIDI_MSG_NOTE_ON        = 0b10010000,
+    MIDI_MSG_CONTROL_CHANGE = 0b10110000,
+    
+    MIDI_MSG_CLOCK    = 0b11111000,
+    MIDI_MSG_START    = 0b11111010,
+    MIDI_MSG_CONTINUE = 0b11111011,
+    MIDI_MSG_STOP     = 0b11111100,
+    
+    MIDI_STATUS_MASK   = 0b10000000,
+    MIDI_COMMAND_MASK  = 0b11110000,
+    MIDI_CHANNEL_MASK  = 0b00001111,
+    MIDI_REALTIME_MASK = 0b11111000,
+    
+    MIDI_CC_ALL_NOTES_OFF  = 123,
+    MIDI_CC_ALL_SOUNDS_OFF = 120,
+};
 
-/* NOTE_ON/OFF|MIDICHANNEL */
-
-#define MIDI_NOTE_ON 0x90
-#define MIDI_NOTE_OFF 0x80
-
-#define MIDI_CC 0xB0
-
-/*  clock (decimal 248, hex 0xF8)
-    start (decimal 250, hex 0xFA)
-    continue (decimal 251, hex 0xFB)
-    stop (decimal 252, hex 0xFC)
-*/	
-
-#define MIDI_CLK 0xF8
-#define MIDI_START 0xFA
-#define MIDI_STOP 0xFC
-#define MIDI_CONT 0xFB
-
-uint16_t velocity_lookup[128] = {
+const uint16_t velocity_lookup[128] = {
 0x0000, 
 0x0200, 
 0x0400, 
@@ -157,7 +156,8 @@ uint16_t velocity_lookup[128] = {
 0xF9E0, 
 0xFBF0, 
 0xFDF0, 
-0xFEF0};
+0xFEF0,
+};
 
 
 #endif /* MIDI_H_ */

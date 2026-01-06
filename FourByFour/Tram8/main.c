@@ -33,6 +33,11 @@
 #include "MAX5825.h"
 //#include "bootloader.h"
 
+enum HardwareConfigValues {
+    NUM_OUT_GATES = 8,
+    NUM_OUT_VOLTAGES = 8,
+};
+
 //PROTOTYPES
 //void startupblink(void);
 void midi_learn(void);
@@ -71,6 +76,7 @@ void clear_pin_inv(uint8_t pinnr);
 	#define BUTTON_RELEASED	4
 
 // Timer configuration
+// Adopted from https://github.com/thorinf/tram8-plus
 #define TIMER_PRESCALER 64
 #define TIMER_FREQ_HZ 1000 // 1kHz = 1ms tick
 #define TIMER_OCR ((F_CPU / TIMER_PRESCALER / TIMER_FREQ_HZ) - 1)
@@ -126,7 +132,7 @@ struct VoltageState {
 
 // --- default config settings
 
-struct GateState gates[8] = {
+struct GateState gates[NUM_OUT_GATES] = {
     {GateMode_Trigger | GateSource_Note, 36, {}, 0}, // TR-8S BD
     {GateMode_Trigger | GateSource_Note, 38, {}, 0}, // TR-8S SD
     {GateMode_Trigger | GateSource_Note, 42, {}, 0}, // TR-8S CH
@@ -137,7 +143,7 @@ struct GateState gates[8] = {
     {GateMode_Trigger | GateSource_Clock,  0, {}, 0}, // RESET trigger
 };
 
-struct VoltageState voltages[8] = {
+struct VoltageState voltages[NUM_OUT_VOLTAGES] = {
     {VoltageSource_Note | 36}, // TR-8S BD
     {VoltageSource_Note | 38}, // TR-8S SD
     {VoltageSource_Note | 42}, // TR-8S CH
@@ -594,24 +600,24 @@ ISR(TIMER2_COMP_vect)
 
 void midi_realtime(uint8_t msg)
 {
-	   if (msg == 0b11111000) // Timing Clock
+	   if (msg == MIDI_MSG_CLOCK)
 	       gates_midi_pulse();
-	   else if (msg == 0b11111010) // Start
+	   else if (msg == MIDI_MSG_START)
 	       gates_midi_reset(1);
-	   else if (msg == 0b11111011) // Continue
+	   else if (msg == MIDI_MSG_CONTINUE)
 	       gates_midi_reset(0);
-	   else if (msg == 0b11111100) // Stop
+	   else if (msg == MIDI_MSG_STOP)
 	       gates_midi_stop();
 }
 
 void midi_command(uint8_t msg, uint8_t ctl, uint8_t val)
 {
-    if (msg == 0b10000000) // Note Off
+    if (msg == MIDI_MSG_NOTE_OFF)
     {
         //voltage_note_or_cc(ctl, val);
         gates_noteoff(ctl);
     }
-    else if (msg == 0b10010000) // Note On
+    else if (msg == MIDI_MSG_NOTE_ON)
     {
         if (val != 0)
         {
@@ -621,9 +627,9 @@ void midi_command(uint8_t msg, uint8_t ctl, uint8_t val)
         else
             gates_noteoff(ctl);
     }
-    else if (msg == 0b10110000) // Control Change
+    else if (msg == MIDI_MSG_CONTROL_CHANGE) // Control Change
     {
-        if (ctl == 123 || ctl == 120)
+        if (ctl == MIDI_CC_ALL_NOTES_OFF || ctl == MIDI_CC_ALL_SOUNDS_OFF)
             gates_allnotesoff();
         else
             voltage_note_or_cc(ctl | VoltageSource_ControlChange, val);
@@ -636,19 +642,21 @@ ISR(USART_RXC_vect)
 	uint8_t uart_data;
 	uart_data = UDR;
 	
-	if (uart_data & 0x80) // command byte
+	if (uart_data & MIDI_STATUS_MASK) // command byte
 	{
-	   if ((uart_data & 0xF8) == 0xF8) // realtime message
+	   if ((uart_data & MIDI_REALTIME_MASK) == MIDI_REALTIME_MASK)
 	   {
 	       midi_realtime(uart_data);
 	   }
 	   else
 	   {
-    	   const uint8_t msg_type = uart_data & 0xF0;
+    	   const uint8_t msg_type = uart_data & MIDI_COMMAND_MASK;
     	   midi_cmd_len = 0;
-    	   if (msg_type == 0b10000000 || msg_type == 0b10010000 || msg_type == 0b10110000)
+    	   if (msg_type == MIDI_MSG_NOTE_ON
+    	       || msg_type == MIDI_MSG_NOTE_OFF
+    	       || msg_type == MIDI_MSG_CONTROL_CHANGE)
     	   {
-    	       const uint8_t channel = uart_data & 0x0F;
+    	       const uint8_t channel = uart_data & MIDI_CHANNEL_MASK;
     	       if (channel == midi_channel)
     	       {
     	           midi_cmd_data[0] = msg_type;
@@ -671,7 +679,7 @@ ISR(USART_RXC_vect)
 void gates_tick_update()
 {
     uint8_t i;
-    for (i = 0; i < 8; ++i)
+    for (i = 0; i < NUM_OUT_GATES; ++i)
         if ((gates[i].flags & GateMode_MASK) == GateMode_Trigger)
             if (gates[i].ticks_until_clear)
                 if (--gates[i].ticks_until_clear == 0)
@@ -681,7 +689,7 @@ void gates_tick_update()
 void gates_midi_reset(uint8_t reset_pulse_counters)
 {
     uint8_t i;
-    for (i = 0; i < 8; ++i)
+    for (i = 0; i < NUM_OUT_GATES; ++i)
     {
         const uint8_t gate_flags = gates[i].flags;
         if ((gate_flags & GateSource_MASK) == GateSource_Clock)
@@ -710,7 +718,7 @@ void gates_midi_reset(uint8_t reset_pulse_counters)
 void gates_midi_pulse()
 {
     uint8_t i;
-    for (i = 0; i < 8; ++i)
+    for (i = 0; i < NUM_OUT_GATES; ++i)
     {
         const uint8_t gate_flags = gates[i].flags;
         if ((gate_flags & GateSource_MASK) == GateSource_Clock)
@@ -751,7 +759,7 @@ void gates_midi_pulse()
 void gates_midi_stop()
 {
     uint8_t i;
-    for (i = 0; i < 8; ++i)
+    for (i = 0; i < NUM_OUT_GATES; ++i)
     {
         const uint8_t gate_flags = gates[i].flags;
         if (gate_flags == (GateSource_Clock | GateMode_Gate))
@@ -769,7 +777,7 @@ void gates_midi_stop()
 void gates_allnotesoff()
 {
     uint8_t i;
-    for (i = 0; i < 8; ++i)
+    for (i = 0; i < NUM_OUT_GATES; ++i)
         if (gates[i].flags == (GateMode_Gate | GateSource_Note))
             (*clear_pin_ptr)(i);           
 }
@@ -778,7 +786,7 @@ void gates_allnotesoff()
 void gates_noteoff(uint8_t note)
 {
     uint8_t i;
-    for (i = 0; i < 8; ++i)
+    for (i = 0; i < NUM_OUT_GATES; ++i)
         if (gates[i].flags == (GateMode_Gate | GateSource_Note))
             if (gates[i].param == note)
                 (*clear_pin_ptr)(i);           
@@ -787,7 +795,7 @@ void gates_noteoff(uint8_t note)
 void gates_noteon(uint8_t note)
 {
     uint8_t i;
-    for (i = 0; i < 8; ++i)
+    for (i = 0; i < NUM_OUT_GATES; ++i)
     {
         const uint8_t gate_flags = gates[i].flags;
         if ((gates[i].flags & GateSource_MASK) == GateSource_Note)
@@ -803,7 +811,7 @@ void gates_noteon(uint8_t note)
 void voltage_note_or_cc(uint8_t note_or_cc, uint8_t val)
 {
     uint8_t i;
-    for (i = 0; i < 8; ++i)
+    for (i = 0; i < NUM_OUT_VOLTAGES; ++i)
         if (voltages[i].note_or_cc == note_or_cc)
             max5825_set_load_channel(7 - i, velocity_lookup[val & 0x7F]);
 }
