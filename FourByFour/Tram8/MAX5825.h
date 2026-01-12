@@ -39,7 +39,7 @@
 
 
 
-void init_max5825(void);
+void init_max5825(uint8_t eightVolts);
 uint8_t test_max5825(void);
 void max5825_set_load_channel(uint8_t ch, uint16_t value);
 

@@ -9,15 +9,13 @@
 #include "MAX5825.h"
 #include "general_twi.h"
 
-void init_max5825(void){
-		
-	
-
+void init_max5825(uint8_t eightVolts)
+{
 	uint8_t data[2] = {0};
 	// INT REF 0b101 = 2.5V 0b111 = 4.1V ALL DAC PWR ON
-	TWI_WRITE_BULK(MAX5825_ADDR,(MAX5825_REG_REF | 0b111),2,&data);	
+	const uint8_t ref_value = eightVolts ? 0b111 : 0b101;
+	TWI_WRITE_BULK(MAX5825_ADDR,(MAX5825_REG_REF | ref_value), 2, &data);	
 	TWI_WRITE_BULK(MAX5825_ADDR,MAX5825_REG_CODELOADALL,2,&data); // all to zero 
-		
 	
 	return;
 }

@@ -9,6 +9,7 @@
 #ifndef MIDI_H_
 #define MIDI_H_
 
+// by c0ff
 enum MidiMagics {
     MIDI_MSG_NOTE_OFF       = 0b10000000,
     MIDI_MSG_NOTE_ON        = 0b10010000,
@@ -25,6 +26,7 @@ enum MidiMagics {
     MIDI_REALTIME_MASK = 0b11111000,
     
     MIDI_CC_ALL_NOTES_OFF  = 123,
+    //MIDI_CC_ALL_CONTROLLERS_OFF = 121,
     MIDI_CC_ALL_SOUNDS_OFF = 120,
 };
 

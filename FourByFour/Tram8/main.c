@@ -1,4 +1,12 @@
 /*
+ * LPZW TRAM8 4x4 formware
+ * Created Jan 2026
+ * by Dmitry S. Baikov
+ * 
+ * Based on the stock 1.3 firmware
+ *
+ * Original header:
+ *
  * toggler.c
  *
  * Created: 22.08.2017 16:49:13
@@ -6,9 +14,7 @@
  * CC BY-NC-ND 4.0
  *
  * Version 1.3
-
  * 
- *
  */ 
 
 
@@ -82,7 +88,6 @@ void clear_pin_inv(uint8_t pinnr);
 #define TIMER_OCR ((F_CPU / TIMER_PRESCALER / TIMER_FREQ_HZ) - 1)
 #define TIMER_TICK_MS (1000 / TIMER_FREQ_HZ)
 
-#define TRIGGER_TICKS 10
 
 void timer_init(void) {
   TCCR2 = (1 << WGM21) | (1 << CS22);
@@ -93,6 +98,8 @@ void timer_init(void) {
 
 /* state globals */
 //uint16_t clock_tick = 0;
+
+enum { CONFIGURATION_FORMAT = 1 };
 
 // --- Gate outputs config
 
@@ -131,12 +138,12 @@ struct VoltageState {
 };
 
 // --- default config settings (36 bytes))
-const uint8_t default_settings[4+ 4+8*2+8*1 +4] = {
+uint8_t cfg[4+ 4+8*2+8*1 +4] = {
     // head marker
     0x90, 0x0d, 0xf0, 0x0d, // good food
 
     // common config
-    0, // version
+    CONFIGURATION_FORMAT, // version
     (1 << 4) | 9, // CV range 8V, (0 = 5V), MIDI channel number (0-15)
     10, // default trigger length in ms
     0, // reserved
@@ -165,30 +172,11 @@ const uint8_t default_settings[4+ 4+8*2+8*1 +4] = {
     0xba, 0xad, 0xf0, 0x0d, // baad food
 };
 
-struct GateState gates[NUM_OUT_GATES] = {
-    {GateMode_Trigger | GateSource_Note, 36, {}, 0}, // TR-8S BD
-    {GateMode_Trigger | GateSource_Note, 38, {}, 0}, // TR-8S SD
-    {GateMode_Trigger | GateSource_Note, 42, {}, 0}, // TR-8S CH
-    {GateMode_Trigger | GateSource_Note, 46, {}, 0}, // TR-8S OH
-    {GateMode_Trigger | GateSource_Clock, 16, {}, 0}, // 2/3 ppqn
-    {GateMode_Trigger | GateSource_Clock, 24, {}, 0}, // 1 ppqn
-    {GateMode_Gate    | GateSource_Clock,  0, {}, 0}, // RUN gate
-    {GateMode_Trigger | GateSource_Clock,  0, {}, 0}, // RESET trigger
-};
-
-struct VoltageState voltages[NUM_OUT_VOLTAGES] = {
-    {VoltageSource_NoteVelocity | 36}, // TR-8S BD
-    {VoltageSource_NoteVelocity | 38}, // TR-8S SD
-    {VoltageSource_NoteVelocity | 42}, // TR-8S CH
-    {VoltageSource_NoteVelocity | 46}, // TR-8S OH
-    {VoltageSource_ControlChange | 24}, // TR-8S BD Level
-    {VoltageSource_ControlChange | 29}, // TR-8S SD Level
-    {VoltageSource_ControlChange | 63}, // TR-8S CH Level
-    {VoltageSource_ControlChange | 82}, // TR-8S OH Level
-};
+struct GateState gates[NUM_OUT_GATES] = {};
+struct VoltageState voltages[NUM_OUT_VOLTAGES] = {};
 
 void show_error();
-void parse_settings();
+int parse_settings();
 
 void gates_tick_update();
 
@@ -200,6 +188,9 @@ void gates_noteoff(uint8_t note);
 void gates_allnotesoff();
 
 void voltage_note_or_cc(uint8_t note_or_cc, uint8_t val);
+
+uint8_t eight_volts = 1;
+uint8_t trigger_ticks = 10;
 
 uint8_t midi_clock_run = 0;
 uint8_t midi_cmd_len = 0;
@@ -225,9 +216,46 @@ uint8_t setting_wait_flag = 0;
 void  (*set_pin_ptr)(uint8_t ) = & set_pin_inv;
 void  (*clear_pin_ptr)(uint8_t ) = & clear_pin_inv;
 
+void show_error()
+{
+    while(true)
+    {
+    	set_LED(ENABLE);
+	   _delay_ms(100);
+	   set_LED(DISABLE);
+	   _delay_ms(100);
+    }
+}
 
 int parse_settings()
 {
+    if (cfg[0] != 0x90 || cfg[1] != 0x0D || cfg[2] != 0xF0 || cfg[3] != 0x0D)
+        return 0;
+    if (cfg[4] != CONFIGURATION_FORMAT)
+        return 0;
+    eight_volts = (cfg[5] >> 4) & 0x01;
+    midi_channel = cfg[5] & 0x0F;
+    trigger_ticks = cfg[6];
+    // cfg[7] reserved
+    
+    const uint8_t gate_cfg_off = 8;
+    for (uint8_t i = 0; i < NUM_OUT_GATES; ++i)
+    {
+        gates[i].flags = cfg[gate_cfg_off + i*2 + 0];
+        gates[i].param = cfg[gate_cfg_off + i*2 + 1];
+        gates[i].current_output = 0;
+        gates[i].midi_pulse_counter = 0;
+    }
+    
+    const uint8_t cv_cfg_off = gate_cfg_off + NUM_OUT_GATES * 2;
+    for (uint8_t i = 0; i < NUM_OUT_VOLTAGES; ++i)
+        voltages[i].note_or_cc = cfg[cv_cfg_off + i];
+        
+    const uint8_t tail_off = cv_cfg_off + NUM_OUT_VOLTAGES;
+    if (cfg[tail_off] != 0xBA || cfg[tail_off+1] != 0xAD
+        || cfg[tail_off+2] != 0xF0 || cfg[tail_off+3] != 0x0D)
+        return 0;
+        
     return 1;
 }
 
@@ -313,13 +341,14 @@ int main(void)
 	PORTC = (1 << PC2)|(1 << PC3);	
 	DDRC  |= (1 << PC2)|(1 << PC3);
 	
+	velocity_out = test_max5825();	//Velocity Out Expander present? (a.k.a. WK4) 
+
 	if (!parse_settings())
 	   show_error();
 	   
-	velocity_out = test_max5825();	//Velocity Out Expander present? (a.k.a. WK4) 
 //	if(velocity_out){
-		init_max5825();
-		init_max5825();		
+		init_max5825(eight_volts);
+		init_max5825(eight_volts);		
 //		max5825_set_load_channel(0,0xFfff);
 //	}
 
@@ -750,7 +779,7 @@ void gates_midi_reset(uint8_t reset_pulse_counters)
             else if (pulse_count == 0 && (gate_flags & GateMode_MASK) == GateMode_Trigger)
             {
                 // output MIDI RESET trigger
-                gates[i].ticks_until_clear = TRIGGER_TICKS;
+                gates[i].ticks_until_clear = trigger_ticks;
                 (*set_pin_ptr)(i);
             }
         }
@@ -774,7 +803,7 @@ void gates_midi_pulse()
                     gates[i].midi_pulse_counter = 0;
                     if ((gate_flags & GateMode_MASK) == GateMode_Trigger)
                     {
-                        gates[i].ticks_until_clear = TRIGGER_TICKS;
+                        gates[i].ticks_until_clear = trigger_ticks;
                         (*set_pin_ptr)(i);
                     }
                     else // GateMode_Gate
@@ -846,7 +875,7 @@ void gates_noteon(uint8_t note)
             {
                 (*set_pin_ptr)(i);
                 if ((gate_flags & GateMode_MASK) == GateMode_Trigger)
-                    gates[i].ticks_until_clear = TRIGGER_TICKS;
+                    gates[i].ticks_until_clear = trigger_ticks;
             }
     }
 }
