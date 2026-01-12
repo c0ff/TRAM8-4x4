@@ -119,7 +119,7 @@ struct GateState {
 // --- CV outputs config
 
 enum VoltageFlags {
-    VoltageSource_Note = 0,
+    VoltageSource_NoteVelocity = 0,
     VoltageSource_ControlChange = 0x80,
     VoltageSource_MASK = 0x80,
     
@@ -130,7 +130,40 @@ struct VoltageState {
     uint8_t note_or_cc; // 0x00 | Note num or 0x80 | CC num
 };
 
-// --- default config settings
+// --- default config settings (36 bytes))
+const uint8_t default_settings[4+ 4+8*2+8*1 +4] = {
+    // head marker
+    0x90, 0x0d, 0xf0, 0x0d, // good food
+
+    // common config
+    0, // version
+    (1 << 4) | 9, // CV range 8V, (0 = 5V), MIDI channel number (0-15)
+    10, // default trigger length in ms
+    0, // reserved
+    
+    // 8 gates (2 bytes per gate)
+    GateMode_Trigger | GateSource_Note,  36, // TR-8S BD
+    GateMode_Trigger | GateSource_Note,  38, // TR-8S SD
+    GateMode_Trigger | GateSource_Note,  42, // TR-8S CH
+    GateMode_Trigger | GateSource_Note,  46, // TR-8S OH
+    GateMode_Trigger | GateSource_Clock, 16, // 2/3 ppqn
+    GateMode_Trigger | GateSource_Clock, 24, // 1 ppqn
+    GateMode_Gate    | GateSource_Clock,  0, // RUN gate
+    GateMode_Trigger | GateSource_Clock,  0, // RESET trigger
+    
+    // 8 CVs (1 byte per CV)
+    VoltageSource_NoteVelocity | 36, // TR-8S BD
+    VoltageSource_NoteVelocity | 38, // TR-8S SD
+    VoltageSource_NoteVelocity | 42, // TR-8S CH
+    VoltageSource_NoteVelocity | 46, // TR-8S OH
+    VoltageSource_ControlChange | 24, // TR-8S BD Level
+    VoltageSource_ControlChange | 29, // TR-8S SD Level
+    VoltageSource_ControlChange | 63, // TR-8S CH Level
+    VoltageSource_ControlChange | 82, // TR-8S OH Level
+    
+    // tail markrer
+    0xba, 0xad, 0xf0, 0x0d, // baad food
+};
 
 struct GateState gates[NUM_OUT_GATES] = {
     {GateMode_Trigger | GateSource_Note, 36, {}, 0}, // TR-8S BD
@@ -144,16 +177,18 @@ struct GateState gates[NUM_OUT_GATES] = {
 };
 
 struct VoltageState voltages[NUM_OUT_VOLTAGES] = {
-    {VoltageSource_Note | 36}, // TR-8S BD
-    {VoltageSource_Note | 38}, // TR-8S SD
-    {VoltageSource_Note | 42}, // TR-8S CH
-    {VoltageSource_Note | 46}, // TR-8S OH
+    {VoltageSource_NoteVelocity | 36}, // TR-8S BD
+    {VoltageSource_NoteVelocity | 38}, // TR-8S SD
+    {VoltageSource_NoteVelocity | 42}, // TR-8S CH
+    {VoltageSource_NoteVelocity | 46}, // TR-8S OH
     {VoltageSource_ControlChange | 24}, // TR-8S BD Level
     {VoltageSource_ControlChange | 29}, // TR-8S SD Level
     {VoltageSource_ControlChange | 63}, // TR-8S CH Level
     {VoltageSource_ControlChange | 82}, // TR-8S OH Level
 };
 
+void show_error();
+void parse_settings();
 
 void gates_tick_update();
 
@@ -190,6 +225,11 @@ uint8_t setting_wait_flag = 0;
 void  (*set_pin_ptr)(uint8_t ) = & set_pin_inv;
 void  (*clear_pin_ptr)(uint8_t ) = & clear_pin_inv;
 
+
+int parse_settings()
+{
+    return 1;
+}
 
 int main(void)
 {
@@ -273,6 +313,9 @@ int main(void)
 	PORTC = (1 << PC2)|(1 << PC3);	
 	DDRC  |= (1 << PC2)|(1 << PC3);
 	
+	if (!parse_settings())
+	   show_error();
+	   
 	velocity_out = test_max5825();	//Velocity Out Expander present? (a.k.a. WK4) 
 //	if(velocity_out){
 		init_max5825();
