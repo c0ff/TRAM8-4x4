@@ -174,7 +174,6 @@ function skip_empty(sv, off) {
 }
 
 function report_bad(msg) {
-    //window.alert(msg);
     throw new Error(msg);
 }
 
@@ -276,6 +275,25 @@ function parse_cfg(sv) {
     document.getElementById("global.triglen").value = triggerLength;
     
     // gates
+    const gt_off = cfg_off + 8;
+    for (let i = 0; i < 8; ++i) {
+        const mode  = syx8[gt_off + i*2 + 0];
+        const param = syx8[gt_off + i*2 + 1];
+        const istrigger = mode & 0x01;
+        var modeval = istrigger;
+        if (param == 0)
+            modeval |= 2;
+        const id = i + 1;
+        document.getElementById("gate" + id + ".mode").value = modeval;
+        if (mode & 0x02) {
+            document.getElementById("gate" + id + ".src").value = 0;
+	        document.getElementById("gate" + id + ".note").value = param;
+        } else {
+            document.getElementById("gate" + id + ".src").value = 1;
+	        document.getElementById("gate" + id + ".pulses").value = param;
+        }
+        CheckGateMode(id);
+    }
     
     // voltages
     const cv_off = cfg_off + 24;
@@ -290,8 +308,7 @@ function parse_cfg(sv) {
             document.getElementById("cv" + id + ".src").value = 1;
 	        document.getElementById("cv" + id + ".cc").value = note_or_cc & 0x7F;
 	    }
-    	document.getElementById("cv" + id + ".note").disabled = !isnote;
-	    document.getElementById("cv" + id + ".cc").disabled = isnote;
+	    CheckVoltageSrc(id);
     }
 }
 
