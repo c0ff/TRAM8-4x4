@@ -155,13 +155,74 @@ function check_syx(sv) {
 }
 
 var SyxEx
+var syx_line_offset = [];
+var syx_line_length = [];
+var syx_cfg_offset = []; // offset of a cfg byte
+
+function is_empty(ch) {
+    return ch == 0x00 || ch == 0x0A;
+}
+
+function skip_empty(sv, off) {
+    for (let i = off; i < sv.length; ++i)
+        if (!is_empty(sv[i]))
+            return i;
+    return sv.length;
+}
+
+function report_bad(msg) {
+    window.alert(msg);
+}
+
+function from_hex(ch) {
+    if (ch >= 0x30 && ch <= 0x39)
+        return ch - 0x30;
+    else if (ch >= 0x41 && ch <= 0x46)
+        return ch - 0x41 + 0x0A;
+    else
+        return report_bad('invalid hex');
+}
+
+function from_2hex(hi, lo) {
+    return from_hex(hi) * 16 + from_hex(lo);
+}
+
+function parse_lines(sv) {
+    syx_line_offset.length = 0;
+    syx_line_length.length = 0;
+    const fw_fin = sv.length - syx_tail.length;
+    var off = syx_head.length;
+    var total_bytes = 0;
+    while (off < fw_fin) {
+        off = skip_empty(sv, off);
+        if (off >= fw_fin)
+            break;
+        if (sv[off] != 0x3A) // ':'
+            return report_bad("Bad line format!");
+        const linelen = from_2hex(sv[off+1], sv[off+2]);
+        syx_line_offset.push(off);
+        syx_line_length.push(linelen);
+        off += 1 + (linelen + 5)*2;
+        total_bytes += linelen;
+        if (!is_empty(sv[off]))
+            return report_bad("Bad line len " + linelen + " " + off);
+    }
+    return total_bytes;
+}
+
+function parse_cfg(sv) {
+    syx_cfg_offset.length = 0;
+}
 
 function parse_sysex(sv) {
-    if (check_syx(sv)) {
-        SysEx = sv;
-        window.alert("Zehr gut!");
-    } else
-        window.alert("Bad food!");    
+    if (!check_syx(sv))
+        return report_bad("Bad food!");
+        
+    const total_bytes = parse_lines(sv);
+    parse_cfg(sv);
+        
+    SysEx = sv;
+    window.alert("Zehr gut! Lines:" + syx_line_length.length + " Bytes: " + total_bytes);
 }
 
 function load_sysex(inp) {
