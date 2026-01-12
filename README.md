@@ -22,6 +22,14 @@ Built on MacOSX using avr-gcc and CMake.
 
 Tested with Squarp Hapax and Nano modules Octa
 
+## To use:
+ - Download and apply `FW SYSEX FILES/tram8_4x4_fw1.syx`
+ - Download and run locally `FW-4x4 HTML FILES/tram8_4x4_fw1.html`
+
+## Note about the editor.
+The editor allows to load and modify a SysEx file. After you made your edits, download a new SysEx
+and update the module as usual. It is *NOT* a live MIDI editor.
+
 
 Default configuration:
 
