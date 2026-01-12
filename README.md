@@ -28,10 +28,10 @@ Tested with Squarp Hapax and Nano modules Octa
 
 ## Note about the editor.
 The editor allows to load and modify a SysEx file. After you made your edits, download a new SysEx
-and update the module as usual. It is *NOT* a live MIDI editor.
+and update the module as usual. It is **NOT** a live MIDI editor.
 
 
-Default configuration:
+## Default configuration:
 
 ### Global:
  - MIDI Channel: 10
