@@ -112,8 +112,8 @@ def mkcv_js(id):
 f'document.getElementById("gate{id}.src").onchange=function(){{CheckVoltageSrc({id});}}\n' +\
 f'CheckVoltageSrc({id});\n\n'
 
+# throw new Error("Not a valid SysEx file!");
 
-    
 # header
 htm = '''
 <!DOCTYPE html>
@@ -121,10 +121,60 @@ htm = '''
 <body>
 
 <p><b>LPZW Tram8 4x4 Firmware Version:</b> 0</p>
+
+<hr>
+<form name="sysex_in">
+<p>Load an existing TRAM8 4x4 SysEx into this form
+<input type="file" accept=".syx" onchange="load_sysex(this)">
+</form>
+
+<script>
+const syx_head = Uint8Array.fromHex("F000297F5438465700");
+const syx_tail = Uint8Array.fromHex("3A303030303030303146460D0AF7");
+
+function isEqualArray(a, b) {
+    if (a.length != b.length)
+        return false;
+    for (let i = 0; i < a.length; i++)
+        if (a[i] != b[i])
+            return false;
+    return true;
+}
+
+function check_syx(sv) {
+    const hdr = sv.subarray(0, syx_head.length)
+    if (!isEqualArray(hdr, syx_head))
+        return false;
+    const tail = sv.subarray(sv.length - syx_tail.length);
+    if (!isEqualArray(tail, syx_tail))
+        return false;
+    for (let i = 1; i < sv.length-1; ++i)
+        if (sv[i] > 0x7F)
+            return false;
+    return true;
+}
+
+var SyxEx
+
+function parse_sysex(sv) {
+    if (check_syx(sv)) {
+        SysEx = sv;
+        window.alert("Zehr gut!");
+    } else
+        window.alert("Bad food!");    
+}
+
+function load_sysex(inp) {
+    var fr = new FileReader();
+    fr.onload = function() { parse_sysex(new Uint8Array(fr.result)); }
+    fr.readAsArrayBuffer(inp.files[0]);
+}
+</script>
 '''
 
 # globals
 htm += f'''
+<form name="sysex_out">
 
 <hr>
 
@@ -180,7 +230,6 @@ htm += mkgate_html(8, 3, 1, 0, 0)
 
 htm+='''
 <script language="javascript">
-var o_form = document.forms[1];
 function CheckGateMode(id) {
 	var d = (document.getElementById("gate" + id + ".mode").value > "1");
 	document.getElementById("gate" + id + ".src").disabled = d;
@@ -231,7 +280,6 @@ htm += mkcv_html(8, 1, 0, 82)
 
 htm+='''
 <script language="javascript">
-var o_form = document.forms[1];
 function CheckVoltageSrc(id) {
 	var isnote = (document.getElementById("cv" + id + ".src").value == "0");
 	document.getElementById("cv" + id + ".note").disabled = !isnote;
@@ -249,6 +297,10 @@ htm+='''
 
 # footer
 htm+='''
+<hr>
+<input type="submit" value="Get the configured SysEx">
+</form>
+
 </body>
 </html>
 '''
