@@ -156,7 +156,7 @@ function check_syx(sv) {
     return true;
 }
 
-var SyxEx
+var SyxEx;
 var syx_line_offset = [];
 var syx_line_length = [];
 var syx_bytes;
@@ -257,7 +257,7 @@ function parse_cfg(sv) {
     var syx8 = new Uint8Array(syx_bytes);
     syx_cfg_offset = find_cfg(syx8);
     const cfg_off = syx_cfg_offset
-    window.alert("Found cfg block at " + cfg_off);
+    //window.alert("Found cfg block at " + cfg_off);
     const ver = syx8[cfg_off + 4];
     if (ver != 0)
         return report_bad("Wrong firmware version!");
@@ -319,6 +319,8 @@ function parse_sysex(sv) {
         syx_bytes = new ArrayBuffer(0, { maxByteLength: 65536 });
         const total_bytes = parse_lines(sv);
         parse_cfg(sv);
+        write_cfg_bytes();
+        parse_cfg(new Uint8Array(syx_bytes));
         SysEx = sv;
         window.alert("Zehr gut! Lines:" + syx_line_length.length + " Bytes: " + total_bytes);
     } catch (err) {
@@ -333,13 +335,168 @@ function load_sysex(inp) {
     fr.onload = function() { parse_sysex(new Uint8Array(fr.result)); }
     fr.readAsArrayBuffer(inp.files[0]);
 }
+
+// writing config
+function write_cfg_bytes() {
+/*
+    var syx8 = new Uint8Array(syx_bytes);
+    const cfg_off = syx_cfg_offset
+    
+    var cvRange = 0;
+    if (document.getElementById("global.cvrange").value > 5)
+        cvRange = 1;
+    const midiChannel = document.getElementById("global.channel").value - 1;
+    syx8[cfg_off + 5] = (cvRange << 4) | (midiChannel & 0x0F);
+
+    const triggerLength = document.getElementById("global.triglen").value;
+    syx8[cfg_off + 6] = triggerLength;
+       
+    // gates
+    const gt_off = cfg_off + 8;
+    for (let i = 0; i < 8; ++i) {
+        var mode;
+        var param;
+        const id = i + 1;
+        const modeval = document.getElementById("gate" + id + ".mode").value;
+        if (modeval > 1) {
+            mode = modeval & 0x01;
+            param = 0;
+        } else {
+            mode = modeval;
+            const isnote = (document.getElementById("gate" + id + ".src").value == 0);
+            if (isnote)
+                param = document.getElementById("gate" + id + ".note").value;
+            else
+                param = document.getElementById("gate" + id + ".pulses").value;
+        }
+        syx8[gt_off + i*2 + 0] = mode;
+        syx8[gt_off + i*2 + 1] = param;
+    }  
+ 
+    // voltages
+    const cv_off = cfg_off + 24;
+    for (let i = 0; i < 8; ++i) {
+        var note_or_cc; 
+        const id = i + 1;
+        const isnote = (document.getElementById("cv" + id + ".src").value == 0);
+        if (isnote)
+    	    note_or_cc = document.getElementById("cv" + id + ".note").value;
+        else
+    	    note_or_cc = document.getElementById("cv" + id + ".cc").value | 0x80;
+	    syx8[cv_off + i] = note_or_cc;
+    }
+    */
+}
+
+function tohex(nib) {
+    if (nib >= 0 && nib <= 9)
+        return nib + 0x30;
+    else if (nib >= 0x0A && nib <= 0x0F)
+        return nib - 0x0A + 0x41;
+    else
+        return report_bad("Invalid nib to tohex " + nib);
+}
+
+function fix_checksum(syx, cfg_line) {
+    const off = syx_line_offset[cfg_line];
+    const lineend = off + 1 + (syx_line_length[cfg_line] + 4) * 2;
+    var chksum = 0;
+    for (let i = 1; i < 9; i += 2)
+        chksum += from_2hex(syx[off+i], syx[off+i+1]);
+    for (let i = off + 9; i < lineend; i += 2) {
+        const b = from_2hex(syx[i], syx[i+1]);
+        chksum += b;
+    }
+    const chkb = (-chksum) & 0xFF;
+    syx[lineend] = tohex(chkb >> 4);
+    syx[lineend + 1] = tohex(chkb & 0x0F);
+ 
+}
+
+function patch_sysex() {
+    var syx = SysEx.slice();
+    var cfg_line = 0;
+    var cfg_pos = 0;
+    var cfg_off = 0;
+    while (cfg_off < syx_cfg_offset) {
+        const diff = syx_cfg_offset - cfg_off;
+        if (syx_line_length[cfg_line] <= diff) {
+            cfg_off += syx_line_length[cfg_line];
+            ++cfg_line;
+        } else {
+            cfg_pos = diff;
+            cfg_off += diff;
+            break;
+        }
+    }
+    //window.alert("cfg_off: " + cfg_off + " cfg_line: " + cfg_line + " cfg_pos: " + cfg_pos);
+    var patched_bytes = 0;
+    // found the config block start, now patch it
+    const CONFIG_BYTES = 36;
+    for (let i = 0; i < CONFIG_BYTES; ) {
+        const avail = syx_line_length[cfg_line] - cfg_pos;
+        const todo = Math.min(avail, CONFIG_BYTES - i);
+        window.alert("todo: " + todo);
+        for (let k = 0; k < todo; ++k) {
+            const b = syx_bytes[syx_cfg_offset + i + k];
+            const hi = tohex(b >> 4);
+            const lo = tohex(b & 0x0F);
+            const syxpos = syx_line_offset[cfg_line] + 9 + cfg_pos * 2;
+            if (syx[syxpos] != hi)
+                ++patched_bytes;
+            syx[syxpos] = hi;
+            if (syx[syxpos+1] != lo)
+                ++patched_bytes;
+            syx[syxpos + 1] = lo
+            ++cfg_pos;
+        }
+        i += todo;
+        if (cfg_pos == syx_line_length[cfg_line] || i == CONFIG_BYTES) {
+            window.alert("fix_checksum line: " + cfg_line);
+            fix_checksum(syx, cfg_line);
+            ++cfg_line;
+            cfg_pos = 0;
+        }
+    }
+    window.alert("Patched bytes: " + patched_bytes);
+    return syx;
+}
+
+// https://stackoverflow.com/questions/3665115/how-to-create-a-file-in-memory-for-user-to-download-but-not-through-server/18197341
+function save(filename, data) {
+    const blob = new Blob([data], {type: 'application/octet-stream'});
+    if(window.navigator.msSaveOrOpenBlob) {
+        window.navigator.msSaveBlob(blob, filename);
+    }
+    else{
+        const elem = window.document.createElement('a');
+        elem.href = window.URL.createObjectURL(blob);
+        elem.download = filename;        
+        document.body.appendChild(elem);
+        elem.click();        
+        document.body.removeChild(elem);
+        window.URL.revokeObjectURL(elem.href);
+    }
+}
+
+function test_checksum_fix() {
+    var out_syx = SysEx.slice();
+    for (let i = 0; i < syx_line_length.length; ++i)
+        fix_checksum(out_syx, i);
+    return out_syx;
+}
+
+function download_sysex() {
+    write_cfg_bytes();
+    const out_syx = test_checksum_fix();
+    //const out_syx = patch_sysex();
+    save("tram8_4x4_edit.syx", out_syx);
+}
 </script>
 '''
 
 # globals
 htm += f'''
-<form name="sysex_out">
-
 <hr>
 
 <p><b>GLOBALS</b></p>
@@ -462,7 +619,8 @@ htm+='''
 # footer
 htm+='''
 <hr>
-<input type="submit" value="Get the configured SysEx">
+<form name="sysex_out" onsubmit="download_sysex(); event.preventDefault()">
+<input type="submit" value="Get the configured SysEx" onchange="download_sysex()">
 </form>
 
 </body>
