@@ -108,9 +108,8 @@ mkccs(f"cv{id}.cc", cc) + '</td><td>' +\
 '</td></tr>\n'
     
 def mkcv_js(id):
-    return f'document.getElementById("gate{id}.mode").onchange=function(){{CheckVoltageSrc({id});}}\n' +\
-f'document.getElementById("gate{id}.src").onchange=function(){{CheckVoltageSrc({id});}}\n' +\
-f'CheckVoltageSrc({id});\n\n'
+    return f'document.getElementById("cv{id}.src").onchange=function(){{CheckVoltageSrc({id});}}\n' +\
+           f'CheckVoltageSrc({id});\n\n'
 
 # throw new Error("Not a valid SysEx file!");
 
@@ -161,6 +160,7 @@ var SyxEx
 var syx_line_offset = [];
 var syx_line_length = [];
 var syx_bytes;
+var syx_cfg_offset;
 
 function is_empty(ch) {
     return ch == 0x00 || ch == 0x0A;
@@ -256,8 +256,43 @@ function find_cfg(v8) {
 
 function parse_cfg(sv) {
     var syx8 = new Uint8Array(syx_bytes);
-    const cfg_off = find_cfg(syx8);
+    syx_cfg_offset = find_cfg(syx8);
+    const cfg_off = syx_cfg_offset
     window.alert("Found cfg block at " + cfg_off);
+    const ver = syx8[cfg_off + 4];
+    if (ver != 0)
+        return report_bad("Wrong firmware version!");
+
+    const cvRange = syx8[cfg_off + 5] >> 4;
+    if (cvRange)
+        document.getElementById("global.cvrange").value = 8;
+    else
+        document.getElementById("global.cvrange").value = 5;
+    
+    const midiChannel = (syx8[cfg_off + 5] & 0x0F) + 1;
+    document.getElementById("global.channel").value = midiChannel;
+
+    const triggerLength = syx8[cfg_off + 6];
+    document.getElementById("global.triglen").value = triggerLength;
+    
+    // gates
+    
+    // voltages
+    const cv_off = cfg_off + 24;
+    for (let i = 0; i < 8; ++i) {
+        const note_or_cc = syx8[cv_off + i];
+        const isnote = (note_or_cc < 0x80);
+        const id = i + 1;
+        if (isnote) {
+            document.getElementById("cv" + id + ".src").value = 0;
+    	    document.getElementById("cv" + id + ".note").value = note_or_cc;
+        } else { 
+            document.getElementById("cv" + id + ".src").value = 1;
+	        document.getElementById("cv" + id + ".cc").value = note_or_cc & 0x7F;
+	    }
+    	document.getElementById("cv" + id + ".note").disabled = !isnote;
+	    document.getElementById("cv" + id + ".cc").disabled = isnote;
+    }
 }
 
 function parse_sysex(sv) {
@@ -302,11 +337,11 @@ htm += f'''
 </tr>
 <tr>
 <td></td>
-<td>{mkchan("global.channel", 10)}</td>
+<td>{mkchan("global.channel", 1)}</td>
 <td></td>
-<td>{mktrig("global.triglen", 10)}</td>
+<td>{mktrig("global.triglen", 1)}</td>
 <td></td>
-<td>{mkcvrange("global.cvrange", 8)}</td>
+<td>{mkcvrange("global.cvrange", 5)}</td>
 </tr>
 </table>
 '''
@@ -343,7 +378,7 @@ htm += mkgate_html(8, 3, 1, 0, 0)
 htm+='''
 <script language="javascript">
 function CheckGateMode(id) {
-	var d = (document.getElementById("gate" + id + ".mode").value > "1");
+	const d = (document.getElementById("gate" + id + ".mode").value > 1);
 	document.getElementById("gate" + id + ".src").disabled = d;
 	if (d) {
 	   document.getElementById("gate" + id + ".note").disabled = d;
@@ -393,7 +428,7 @@ htm += mkcv_html(8, 1, 0, 82)
 htm+='''
 <script language="javascript">
 function CheckVoltageSrc(id) {
-	var isnote = (document.getElementById("cv" + id + ".src").value == "0");
+	const isnote = (document.getElementById("cv" + id + ".src").value == 0);
 	document.getElementById("cv" + id + ".note").disabled = !isnote;
 	document.getElementById("cv" + id + ".cc").disabled = isnote;
 }
