@@ -13,7 +13,7 @@ Timer code for 1ms ticks from https://github.com/thorinf/tram8-plus/
 
 Firmware supports both gate and trigger outputs with custom ppqn, CC, and Note support.
 
-At the moment the configuration is hardcoded. An HTML-based SysEx editor is planned.
+An offline HTML-based SysEx editor is available. See the HTML-UI folder.
 
 
 Hacked by Dmitry Baikov.
@@ -25,30 +25,31 @@ Tested with Squarp Hapax and Nano modules Octa
 
 Default configuration:
 
-```c
-struct GateState gates[NUM_OUT_GATES] = {
-    {GateMode_Trigger | GateSource_Note, 36, {}, 0}, // TR-8S BD
-    {GateMode_Trigger | GateSource_Note, 38, {}, 0}, // TR-8S SD
-    {GateMode_Trigger | GateSource_Note, 42, {}, 0}, // TR-8S CH
-    {GateMode_Trigger | GateSource_Note, 46, {}, 0}, // TR-8S OH
-    {GateMode_Trigger | GateSource_Clock, 16, {}, 0}, // 2/3 ppqn
-    {GateMode_Trigger | GateSource_Clock, 24, {}, 0}, // 1 ppqn
-    {GateMode_Gate    | GateSource_Clock,  0, {}, 0}, // RUN gate
-    {GateMode_Trigger | GateSource_Clock,  0, {}, 0}, // RESET trigger
-};
+### Global:
+ - MIDI Channel: 10
+ - Trigger length: 10ms
+ - CV range: 0-8V
+ 
+### Gates:
+ 1. Trigger on NoteOn 36 // TR-8S BD
+ 2. Trigger on NoteOn 38 // TR-8S SD
+ 3. Trigger on NoteOn 42 // TR-8S CH
+ 4. Trigger on NoteOn 46 // TR-8S OH
+ 5. Trigger on triplets (16 MIDI pulses) // 2/3 ppqn
+ 6. Trigger on quarters (24 MIDI pulses) // 1 ppqn
+ 7. Gate on MIDI START/CONT until STOP   // RUN gate
+ 8. Reset trigger on MIDI START/STOP     // RESET trigger
 
-struct VoltageState voltages[NUM_OUT_VOLTAGES] = {
-    {VoltageSource_Note | 36}, // TR-8S BD
-    {VoltageSource_Note | 38}, // TR-8S SD
-    {VoltageSource_Note | 42}, // TR-8S CH
-    {VoltageSource_Note | 46}, // TR-8S OH
-    {VoltageSource_ControlChange | 24}, // TR-8S BD Level
-    {VoltageSource_ControlChange | 29}, // TR-8S SD Level
-    {VoltageSource_ControlChange | 63}, // TR-8S CH Level
-    {VoltageSource_ControlChange | 82}, // TR-8S OH Level
-};
-```
+### Voltages:
+ 1. Velocity of Note 36 // TR-8S BD
+ 2. Velocity of Note 38 // TR-8S SD
+ 3. Velocity of Note 42 // TR-8S CH
+ 4. Velocity of Note 46 // TR-8S OH
+ 5. Value of Controller 24 // TR-8S BD Level
+ 6. Value of Controller 29 // TR-8S SD Level
+ 7. Value of Controller 63 // TR-8S CD Level
+ 8. Value of Controller 82 // TR-8S OH Level
+
 
 # CC BY-NC-ND 4.0 KAY KNOFE OF LPZW.modules
-
-
+## parts CC BY-NC-ND 4.0 DMITRY S. BAIKOV
