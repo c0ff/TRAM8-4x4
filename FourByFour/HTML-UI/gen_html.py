@@ -132,6 +132,9 @@ htm = '''
 const syx_head = Uint8Array.fromHex("F000297F5438465700");
 const syx_tail = Uint8Array.fromHex("3A303030303030303146460D0AF7");
 
+const cfg_head = Uint8Array.fromHex("900DF00D");
+const cfg_tail = Uint8Array.fromHex("BAADF00D");
+
 function isEqualArray(a, b) {
     if (a.length != b.length)
         return false;
@@ -157,7 +160,7 @@ function check_syx(sv) {
 var SyxEx
 var syx_line_offset = [];
 var syx_line_length = [];
-var syx_cfg_offset = []; // offset of a cfg byte
+var syx_bytes;
 
 function is_empty(ch) {
     return ch == 0x00 || ch == 0x0A;
@@ -171,7 +174,8 @@ function skip_empty(sv, off) {
 }
 
 function report_bad(msg) {
-    window.alert(msg);
+    //window.alert(msg);
+    throw new Error(msg);
 }
 
 function from_hex(ch) {
@@ -187,6 +191,30 @@ function from_2hex(hi, lo) {
     return from_hex(hi) * 16 + from_hex(lo);
 }
 
+function decode_line(sv, off) {
+    if (sv[off] != 0x3A) // ':'
+        return report_bad("Bad line format!");
+    const linelen = from_2hex(sv[off+1], sv[off+2]);
+    var linepos = syx_bytes.byteLength;
+    syx_bytes.resize(linepos + linelen);
+    var store_bytes = new Uint8Array(syx_bytes);
+    const lineend = off + 1 + (linelen + 4) * 2;
+    var chksum = 0;
+    for (let i = 1; i < 9; i += 2)
+        chksum += from_2hex(sv[off+i], sv[off+i+1]);
+    for (let i = off + 9; i < lineend; i += 2) {
+        const b = from_2hex(sv[i], sv[i+1]);
+        store_bytes[linepos++] = b;
+        chksum += b;
+    }
+    if (linepos != syx_bytes.byteLength)
+        return report_bad("Failed to decode the line at " + off + " linepos: " + linepos + " len: " + syx_bytes.byteLength);
+    chksum += from_2hex(sv[lineend], sv[lineend + 1]);
+    if (chksum & 0xFF)
+        return report_bad("Invalid checksum of the line at " + off);
+    return linelen;
+}
+
 function parse_lines(sv) {
     syx_line_offset.length = 0;
     syx_line_length.length = 0;
@@ -197,9 +225,7 @@ function parse_lines(sv) {
         off = skip_empty(sv, off);
         if (off >= fw_fin)
             break;
-        if (sv[off] != 0x3A) // ':'
-            return report_bad("Bad line format!");
-        const linelen = from_2hex(sv[off+1], sv[off+2]);
+        const linelen = decode_line(sv, off);
         syx_line_offset.push(off);
         syx_line_length.push(linelen);
         off += 1 + (linelen + 5)*2;
@@ -210,19 +236,44 @@ function parse_lines(sv) {
     return total_bytes;
 }
 
+function find_cfg(v8) {
+    var i = v8.indexOf(cfg_head[0]);
+    while (i >= 0) {
+        const head = v8.subarray(i, i + cfg_head.length);
+        if (!isEqualArray(head, cfg_head)) {
+            i = v8.indexOf(cfg_head[0], i + 1);
+            continue;
+        }
+        const tail = v8.subarray(i + 32, i + 32 + cfg_tail.length);
+        if (!isEqualArray(tail, cfg_tail)) {
+            i = v8.indexOf(cfg_head[0], i + cfg_head.length);
+            continue;
+        }
+        return i;
+    }
+    return report_bad("Cannot find configuration block!");
+}
+
 function parse_cfg(sv) {
-    syx_cfg_offset.length = 0;
+    var syx8 = new Uint8Array(syx_bytes);
+    const cfg_off = find_cfg(syx8);
+    window.alert("Found cfg block at " + cfg_off);
 }
 
 function parse_sysex(sv) {
-    if (!check_syx(sv))
-        return report_bad("Bad food!");
-        
-    const total_bytes = parse_lines(sv);
-    parse_cfg(sv);
-        
-    SysEx = sv;
-    window.alert("Zehr gut! Lines:" + syx_line_length.length + " Bytes: " + total_bytes);
+    try {
+        if (!check_syx(sv))
+            return report_bad("Bad food!");
+        syx_bytes = new ArrayBuffer(0, { maxByteLength: 65536 });
+        const total_bytes = parse_lines(sv);
+        parse_cfg(sv);
+        SysEx = sv;
+        window.alert("Zehr gut! Lines:" + syx_line_length.length + " Bytes: " + total_bytes);
+    } catch (err) {
+        window.alert(err);
+        syx_bytes = undefined;
+        return;
+    }
 }
 
 function load_sysex(inp) {
