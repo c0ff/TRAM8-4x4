@@ -5,7 +5,7 @@ Based on Stock Firmware 1.3
 Timer code for 1ms ticks from https://github.com/thorinf/tram8-plus/
 
 
-4x4 means:
+4x4 comes from the initial idea and now the default configuration:
 - 4 trigger outputs for notes 36, 38, 42, 46 which correspond to TR-8S BD, SD, CH, OH
 - 4 velocity CV outputs for these notes, 0-8V
 - 4 clock outputs: tripets, quarters, Run gate, Reset trigger
@@ -13,10 +13,13 @@ Timer code for 1ms ticks from https://github.com/thorinf/tram8-plus/
 
 Firmware supports both gate and trigger outputs with custom ppqn, CC, and Note support.
 
-An offline HTML-based SysEx editor is available. See the HTML-UI folder.
+An offline HTML-based SysEx editor is available.
+The editor is heavily inspired by http://mutantbrainsurgery.hexinverter.net
+but mine is completely offline - one standalone HTML page with no dependencies.
 
 
-Hacked by Dmitry Baikov.
+Hacked (in the old school meaning, i.e. creating something quickly just for fun) by Dmitry Baikov.
+The editor was created from scratch in a long one-day 16-hour session. It was fun!
 
 Built on MacOSX using avr-gcc and CMake.
 
@@ -27,7 +30,7 @@ Tested with Squarp Hapax and Nano modules Octa
  - Download and run locally `FW-4x4 HTML FILES/tram8_4x4_fw1.html`
 
 ## Note about the editor.
-The editor allows to load and modify a SysEx file. After you made your edits, download a new SysEx
+The editor expects you to load and modify a SysEx file. After you made your edits, download a new SysEx
 and update the module as usual. It is **NOT** a live MIDI editor.
 
 
@@ -57,6 +60,13 @@ and update the module as usual. It is **NOT** a live MIDI editor.
  6. Value of Controller 29 // TR-8S SD Level
  7. Value of Controller 63 // TR-8S CD Level
  8. Value of Controller 82 // TR-8S OH Level
+ 
+ ## Ideas for future development:
+  - Support for using separate MIDI channels for each output
+  - Clock divider in quarters, not only in pulses. Quarters will allow for up to 32 bars for a flip-flop phase, i.e. square LFO with periods up to 64 bars long.
+  - More MIDI messages: Pitchbend, Channel Aftertouch ...
+  - Add names for more Well-Known Controllers. At the moment it is only 6 (ModWheel)
+  - ... your ideas are welcome!
 
 
 # CC BY-NC-ND 4.0 KAY KNOFE OF LPZW.modules
