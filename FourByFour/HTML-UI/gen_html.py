@@ -6,6 +6,8 @@
 #
 # https://github.com/c0ff/TRAM8-4x4
 #
+import argparse
+import binascii
 
 CONFIGURATION_FORMAT = 1
 
@@ -136,9 +138,13 @@ htm = '''
 <p>
 '''
 
-htm += f'<b>LPZW Tram8 4x4 Firmware.</b> Configuration Format: {CONFIGURATION_FORMAT}<br />\n'
+htm += f'''
+<b>LPZW Tram8 4x4 Firmware.</b> Configuration Format: {CONFIGURATION_FORMAT} rev.A<br />
+rev. A: <i>tram8_4x4_fw1.syx loaded by default.</i><br />
+'''
 
 htm += '''
+<br />
 For updates visit: 
 <a href="https://github.com/c0ff/TRAM8-4x4">https://github.com/c0ff/TRAM8-4x4</a>
 </p>
@@ -533,7 +539,7 @@ function download_sysex() {
     var syx8 = new Uint8Array(syx_bytes.slice());
     write_cfg_bytes(syx8);
     const out_syx = patch_sysex(syx8);
-    save("tram8_4x4_edit.syx", out_syx);
+    save("tram8_4x4_fw1_edit.syx", out_syx);
 }
 </script>
 '''
@@ -660,7 +666,8 @@ htm+='''
 '''
 
 # footer
-htm+='''
+def add_footer(htm):
+    return htm + '''
 <hr>
 <form name="sysex_out" onsubmit="download_sysex(); event.preventDefault()">
 <input type="submit" value="Get the configured SysEx" onchange="download_sysex()">
@@ -673,4 +680,35 @@ CC BY-NC-ND 4.0 Dmitry S. Baikov<br />
 </html>
 '''
 
-print(htm)
+def add_firmware(htm, fw_file):
+    fw = open(fw_file, 'rb').read()
+    fw_hex = binascii.hexlify(fw).decode('utf-8')
+    ah = f'''
+<script>
+// default 4x4 Firmware SysEx
+const firmware_syx = Uint8Array.fromHex("{fw_hex}");
+''' + '''
+window.onload = function() { parse_sysex(firmware_syx); };
+</script>
+'''
+    return htm + ah
+
+def main():
+    global htm
+    ap = argparse.ArgumentParser()
+    ap.add_argument('-o', '--output')
+    ap.add_argument('--firmware-sysex')
+    args = ap.parse_args()
+    
+    if args.firmware_sysex:
+        htm = add_firmware(htm, args.firmware_sysex)
+    
+    htm = add_footer(htm)
+    
+    if args.output:
+        open(args.output, 'w', encoding='utf8').write(htm)
+    else:
+        print(htm)
+    
+if __name__=="__main__":
+    main()
