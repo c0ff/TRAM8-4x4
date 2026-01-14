@@ -5,13 +5,14 @@
 ### Why the fuss.
 
 When I initially bought Tram8, it did exactly what I needed back then.
-However, having an open source firware was one of the selling points.
+However, having an open source firware was one of the selling points. Later my setup changed and I wanted to use Tram8 in a way that no firmware variants allowed.
 
-I also have a Hexinverter's' Mutant Brain module (now produced by Erica Synths) which has a very nice configuration UI website where you can upload a firmware SysEx, tweak the settings and get the modified SysEx back.
+In the eurorack land there's some variation in control voltage range standards between module manufacturers. There are 0..5V -5..+5V 0..8V 0..10V and -10..+10V. What a zoo! I happen to have and mostly use a system by Make Noise with 0..8V CV range. The stock Tram8 firmware only did 0..5V, however the manual states that it can do 0..10V, but no available firmware variants could do it.
 
-In the eurorack land there's some variation in control voltage range standards between module manufacturers. There are 0..5V -5..+5V 0..8V 0..10V and -10..+10V. What a zoo! I happen to have and mostly use a system by Make Noise with 0..8V CV range.
+When I started digging into Tram8 firmware(s), I found out that the hardware is capable to output either 0..5V or 0..8V voltage ranges on its CV outputs which is decided on the initializaton stage. (The manual says 0..10V but that was changed in the production revisions to 0..8V for cost reasons, according to the creator). I also found that there're several firmware versions which do different things, but on the source level are almost identical.
 
-When I started digging into Tram8 firmware(s), I found out that the hardware is capable to output both 0..5V and 0..8V voltage ranges on its CV outputs (the manual states 0..10V but that was changes in the production revisions to 0..8V for cost reasons, according to the creator). I also found that there're several firmware versions which do different things, but on the source level lool almost identical.
+I also have a Hexinverter's Mutant Brain module (now produced by Erica Synths) which has a very nice configuration UI website where you can upload a firmware SysEx, tweak the settings and get the modified SysEx back. This is what I would like to have for Tram8, And it looked doable.
+
 
 
 ### A flashback from the past.
