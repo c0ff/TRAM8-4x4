@@ -1,6 +1,6 @@
 # How it was done.
 
-## The firmware story.
+## The firmware.
 
 ### Why the fuss.
 
@@ -31,6 +31,33 @@ Then I started coding, having a very clear picture of how the code will work. It
 
 The firmware worked. Now it was time to create the editor.
 
+
+
 ## The editor.
+
+
+### The inspiration.
+
+Thinking of the configuration editor I was heavily inspired by Mutant Brain Surgery - the configuration website for the Mutant Brain module (http://mutantbrainsurgery.hexinverter.net). It is slick, minimal and very easy to use. The main downside I saw - it is a website, meaning you need to be online each time you. want to reconfigure the module. I might be in my shed in the woods - how will I change that output mode?
+
+
+### The ugly truth.
+
+I haven't touched HTML and JS for 20 years. My first realization was that ComboBoxes cannot use a shared dataset for their choice list. It was a shame. It meant that for each output I have to copy-paste the ComboBox descriptions, and I hate stupid work. So, what do we do then? This is a poster case for code generation. The initial HTML attempt was scrapped and reused as a template for a Python script which would do the repetitive stuff for me.
+
+
+### The fork in the road.
+
+Generating the HTML UI was pretty straightforward. Now comes the fun part - reading and writing SysEx.
+
+Trying to find the configuration block markers in the firmware SysEx gave nothing. I haven't dealt with writing for embedded hardware before. All I knew that the toolchain produces a .hex file which I then convert using a hex_2_syx.py tool provided with the firmware sources. I started digging.
+
+hex_2_syx.py turned out to be very simple and straightforward: it just dumps the .hex file interspersed with some zeroes, adds a head and tail markers and that's it. Getting the original .hex from .syx was pretty easy - just check the markers, skip the zeroes and stick together what's left.
+
+.hex files seem to be a common format for firmware encapsulation and is very simple https://www.tasking.com/documentation/smartcode/ctc/reference/objfmt_hex.html
+
+One way of getting and setting the configuration block was to get the firmware image from IntelHex in the SysEx, edit the data, and then recreate the .hex and .syx back. While looking straightforward, it would require an elaborate .hex parser, taking into the account all record types and their meaning. I didn't want to spend my time on this - it would be long, not fun, with complex and error prone code. An overkill for a humble configuration editor. And I didn't want to become a JavaScript professional.
+
+### The patching trick.
 
 ... to be written.
