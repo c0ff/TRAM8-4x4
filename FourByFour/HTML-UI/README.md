@@ -54,10 +54,51 @@ Trying to find the configuration block markers in the firmware SysEx gave nothin
 
 hex_2_syx.py turned out to be very simple and straightforward: it just dumps the .hex file interspersed with some zeroes, adds a head and tail markers and that's it. Getting the original .hex from .syx was pretty easy - just check the markers, skip the zeroes and stick together what's left.
 
-.hex files seem to be a common format for firmware encapsulation and is very simple https://www.tasking.com/documentation/smartcode/ctc/reference/objfmt_hex.html
+.hex files seem to be a common format for firmware encapsulation and is very simple
+https://www.tasking.com/documentation/smartcode/ctc/reference/objfmt_hex.html
 
 One way of getting and setting the configuration block was to get the firmware image from IntelHex in the SysEx, edit the data, and then recreate the .hex and .syx back. While looking straightforward, it would require an elaborate .hex parser, taking into the account all record types and their meaning. I didn't want to spend my time on this - it would be long, not fun, with complex and error prone code. An overkill for a humble configuration editor. And I didn't want to become a JavaScript professional.
 
 ### The patching trick.
 
-... to be written.
+What if we parse the SysEx, getting the raw byte represenation of the firmware, while remembering where these bytes are located in the SysEx? This was we can use the raw firmware bytes to locate and read the configuration block, and use the remembered positions of these bytes to patch them directly in the SysEx image.
+
+This is exactly how I did it. I just parse the SysEx, finding IntelHex records inside and remember the position of each record in the SysEx Uint8Aarray. At the same time I decode records and append their content to a separate Uint8Array which I will refer to as a raw firmware bytes. Strictly speaking, there are several record types in an IntelHex file, but I just clump the data of all the records together in the hope that my configuration block is in a continious set of data records, not interleaved with anything else. And practice showed this is exactly the case.
+
+Using the arrays of offsets and lengths of every IntelHex record I can locate every byte of the raw representation back in the original SysEx. Because I am patching the data in-place, not changing its length, I do not need to recreate the SysEx from scratch - I can directly modify every byte I need. The only additional burden is to update IntelHex checksums of each record I touched.
+
+### It loads!
+
+The SysEx loading part of the editor:
+ - uses an HTML form trick to avoid reloading the page: the `Browse` button `onchange` JS handler loads the file without a need to submit the form
+ - Reads SysEx from the file and feeds it into the parser
+ - Validates SysEx header and footer
+ - finds IntelHex records, skipping zeros and LF characters
+ - parses each records, adding its offset and content length to respective arrays
+ - decodes content of each record and appends it to the `syx_bytes` Uint8Array
+ - Finds the configuration block in the `syx_bytes` array using the markers, and stores its offset
+ - Parses the configuration and sets GUI controls to match the settings.
+ 
+### It saves!
+ 
+The SysEx saving part does the following:
+ - Uses an HTML form `onsubmit` JS trick to avoid reloading the page and calls the JS writer
+ - Makes a copy of `syx_bytes` array and packs current GUI settings into configuration block. (Trying to patch the original `syx_bytes` directly costed me about 30 min of debugging and not understading why the firmware gets corrupted. Still don't know why it got corrupted, but writing to a firmware copy resolved the issue.)
+ - Now comes the fun part: for each byte of the new configuration block I locate its position in the SysEx, patch it. And for each touched IntelHex records I update its checksum.
+ - After all is said and done the editor forces a download of the generated SysEx using another trick from StackOverflow.
+
+ 
+## Closing thoughts.
+
+Using vanilla HTML and JS allowed to make this editor a single self-containted HTML page which works completely offline. A single-page WebApp if you like.
+
+Initially it required to load a firmware first, but I quickly realised that I can embed the corresponing firmware directly into the page and parse it in the `onpageload` JS handler. Rev.A does exactly this.
+
+I decided to use numbers for firmware version/configuration block format id, because it is stored inside as uint8_t,  and use Rev [A-Z] for pure GUI changes. 
+
+I think this editor might serve as a base for similar tools because the Tram8 specifics occupy only a small part of code. Most of the stuff is pretty universal for any IntelHex/SysEx patching tasks.
+ 
+The editor was created in one long 16-hour coding session. It was fun.
+
+
+### experienced and documented by Dmitry S. Baikov
