@@ -9,8 +9,10 @@
  - Per-gate output modes: Gate or Trigger
  - Configurable global trigger length (1 - 120 ms)
  - Gate/Trigger sources: Note On, MIDI Clock divisors, RUN gate, Reset trigger
+ - Gate output from Clock divisor works as a flip-flop (square LFO)
  - CV sources: Note Velocity, Controller Value (CC)
  - Supports All Sound Off and All Notes Off messages
+ - **No learn mode at the moment**
 
 Based on Stock Firmware 1.3
 
