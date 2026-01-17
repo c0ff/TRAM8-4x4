@@ -9,7 +9,8 @@
 import argparse
 import binascii
 
-CONFIGURATION_FORMAT = 1
+CONFIGURATION_FORMAT = 2
+CONFIGURATION_LENGTH = 46
 
 def incrange(start, incl_end, step=1):
     return list(range(start, incl_end + step, step))
@@ -88,13 +89,15 @@ def mkgate_html(id, mode, src, note, pulses=0):
 mkgatemode(f"gate{id}.mode", mode) + '</td><td>' +\
 mkgatesrc(f"gate{id}.src", src) + '</td><td>' +\
 mknotes(f"gate{id}.note", note) + '</td><td>' +\
-f'<input type="number" min=1 max=127 name="gate{id}.pulses" id="gate{id}.pulses" value={pulses}>' +\
-'</td></tr>\n'
+f'<input type="number" min=1 max=127 name="gate{id}.pulses" id="gate{id}.pulses" value={pulses} /></td>'+\
+f'<td><input type="checkbox" name="gate{id}.usechan" id="gate{id}.usechan" /></td>'+\
+'<td>' + mkchan(f"gate{id}.channel", 0) + '</td></tr>\n'
     
 def mkgate_js(id):
-    return f'document.getElementById("gate{id}.mode").onchange=function(){{CheckGateMode({id});}}\n' +\
-           f'document.getElementById("gate{id}.src").onchange=function(){{CheckGateMode({id});}}\n' +\
-           f'CheckGateMode({id});\n\n'
+    return f'document.getElementById("gate{id}.mode").onchange=function(){{CheckGateMode({id});}};\n' +\
+           f'document.getElementById("gate{id}.src").onchange=function(){{CheckGateMode({id});}};\n' +\
+           f'document.getElementById("gate{id}.usechan").onchange=function(){{CheckGateMode({id});}};\n'+\
+           f'//CheckGateMode({id});\n\n'
 
 def mkcvrange(name, def_val):
     vals=[('0-5V', 5), ('0-8V', 8)]
@@ -119,11 +122,13 @@ def mkcv_html(id, src, note, cc=0):
 mkcvsrc(f"cv{id}.src", src) + '</td><td>' +\
 mknotes(f"cv{id}.note", note) + '</td><td>' +\
 mkccs(f"cv{id}.cc", cc) + '</td><td>' +\
-'</td></tr>\n'
+f'<input type="checkbox" name="cv{id}.usechan" id="cv{id}.usechan" /></td><td>' +\
+mkchan(f"cv{id}.channel", 0) + '</td></tr>\n'
     
 def mkcv_js(id):
     return f'document.getElementById("cv{id}.src").onchange=function(){{CheckVoltageSrc({id});}}\n' +\
-           f'CheckVoltageSrc({id});\n\n'
+           f'document.getElementById("cv{id}.usechan").onchange=function(){{CheckVoltageSrc({id});}};\n'+\
+           f'//CheckVoltageSrc({id});\n\n'
 
 
 # header
@@ -139,8 +144,8 @@ htm = '''
 '''
 
 htm += f'''
-<b>LPZW Tram8 4x4 Firmware.</b> Configuration Format: {CONFIGURATION_FORMAT} rev.A<br />
-rev. A: <i>tram8_4x4_fw1.syx loaded by default.</i><br />
+<b>LPZW Tram8 4x4 Firmware.</b> Configuration Format: {CONFIGURATION_FORMAT}<br />
+<i>tram8_4x4_fw2.syx loaded by default.</i><br />
 '''
 
 htm += '''
@@ -158,7 +163,11 @@ For updates visit:
 <script>
 '''
 
-htm += f'const CONFIGURATION_FORMAT = {CONFIGURATION_FORMAT};\n'
+htm += f'''
+const CONFIGURATION_FORMAT = {CONFIGURATION_FORMAT};
+const CONFIGURATION_LENGTH = {CONFIGURATION_LENGTH};
+const CONFIGURATION_FILENAME = "tram8_4x4_fw{CONFIGURATION_FORMAT}_edit.syx";
+'''
 
 htm += '''
 const syx_head = Uint8Array.fromHex("F000297F5438465700");
@@ -167,6 +176,7 @@ const syx_tail = Uint8Array.fromHex("3A303030303030303146460D0AF7");
 const cfg_head = Uint8Array.fromHex("900DF00D");
 const cfg_tail = Uint8Array.fromHex("BAADF00D");
 
+    
 function isEqualArray(a, b) {
     if (a.length != b.length)
         return false;
@@ -282,7 +292,8 @@ function find_cfg(v8) {
             i = v8.indexOf(cfg_head[0], i + 1);
             continue;
         }
-        const tail = v8.subarray(i + 32, i + 32 + cfg_tail.length);
+        const tail_pos = i + CONFIGURATION_LENGTH - cfg_tail.length;
+        const tail = v8.subarray(tail_pos, tail_pos + cfg_tail.length);
         if (!isEqualArray(tail, cfg_tail)) {
             i = v8.indexOf(cfg_head[0], i + cfg_head.length);
             continue;
@@ -292,28 +303,45 @@ function find_cfg(v8) {
     return report_bad("Cannot find configuration block!");
 }
 
+function parse_channel_map(syx8, map_off, ctl_type, def_chan) {
+    var usemask = syx8[map_off];
+    for (let i = 0; i < 8; ++i) {
+        const id = i + 1;
+        const usechan = (usemask >> i) & 1
+        document.getElementById(ctl_type + id + ".usechan").checked = usechan;
+        const chan = ((syx8[map_off + 1 + (i >> 1)]) >> ((i & 1) ? 4 : 0)) & 0x0F;
+        document.getElementById(ctl_type + id + ".channel").value = usechan ? (chan + 1) : def_chan;
+    }
+}
+
 function parse_cfg(syx8) {
     syx_cfg_offset = find_cfg(syx8);
-    const cfg_off = syx_cfg_offset;
-    debug_log("Found cfg block at " + cfg_off);
-    const ver = syx8[cfg_off + 4];
+    debug_log("Found cfg block at " + syx_cfg_offset);
+    
+    const cfg_off = syx_cfg_offset + cfg_head.length;
+    const ver = syx8[cfg_off];
     if (ver != CONFIGURATION_FORMAT)
         return report_bad("Unsupported configuration format: " + ver);
 
-    const cvRange = syx8[cfg_off + 5] >> 4;
+    const cvRange = syx8[cfg_off + 1] >> 4;
     if (cvRange)
         document.getElementById("global.cvrange").value = 8;
     else
         document.getElementById("global.cvrange").value = 5;
     
-    const midiChannel = (syx8[cfg_off + 5] & 0x0F) + 1;
+    const midiChannel = (syx8[cfg_off + 1] & 0x0F) + 1;
     document.getElementById("global.channel").value = midiChannel;
 
-    const triggerLength = syx8[cfg_off + 6];
+    const triggerLength = syx8[cfg_off + 2];
     document.getElementById("global.triglen").value = triggerLength;
     
+    // TODO: if (cvRange): syx8[cfg_off + 3] is CV outputs 5V downscaling mask.
+    
+    parse_channel_map(syx8, cfg_off + 4, "gate", midiChannel);
+    parse_channel_map(syx8, cfg_off + 9, "cv", midiChannel);
+    
     // gates
-    const gt_off = cfg_off + 8;
+    const gt_off = cfg_off + 14;
     for (let i = 0; i < 8; ++i) {
         const mode  = syx8[gt_off + i*2 + 0];
         const param = syx8[gt_off + i*2 + 1];
@@ -327,15 +355,17 @@ function parse_cfg(syx8) {
         if (mode & 0x02) {
             document.getElementById("gate" + id + ".src").value = 0;
 	        document.getElementById("gate" + id + ".note").value = param;
+	        //document.getElementById("gate" + id + ".pulses").value = 0;
         } else {
             document.getElementById("gate" + id + ".src").value = 1;
+            //document.getElementById("gate" + id + ".note").value = 0;
 	        document.getElementById("gate" + id + ".pulses").value = param;
         }
         CheckGateMode(id);
     }
     
     // voltages
-    const cv_off = cfg_off + 24;
+    const cv_off = cfg_off + 30;
     for (let i = 0; i < 8; ++i) {
         const note_or_cc = syx8[cv_off + i];
         const isnote = (note_or_cc < 0x80);
@@ -385,20 +415,40 @@ function load_sysex(inp) {
 }
 
 // writing config
+function write_channel_map(syx8, map_off, ctl_type) {
+    var usemask = 0;
+    for (let i = 0; i < 8; ++i) {
+        const id = i + 1;
+        const usechan = document.getElementById(ctl_type + id + ".usechan").checked;
+        if (usechan)
+            usemask |= 1 << i;
+        const chan = document.getElementById(ctl_type + id + ".channel").value - 1;
+        const chan_shift = (i & 1) ? 4 : 0;
+        const chan_off = map_off + 1 + (i >> 1);
+        syx8[chan_off] &= 0x0F << chan_shift; // clear
+        if (usechan)
+            syx8[chan_off] |= (chan & 0x0F) << chan_shift; // set
+    }
+    syx8[map_off] = usemask;
+}
+
 function write_cfg_bytes(syx8) {
-    const cfg_off = syx_cfg_offset;
+    const cfg_off = syx_cfg_offset + cfg_head.length;
     
     var cvRange = 0;
     if (document.getElementById("global.cvrange").value > 5)
         cvRange = 1;
     const midiChannel = document.getElementById("global.channel").value - 1;
-    syx8[cfg_off + 5] = (cvRange << 4) | (midiChannel & 0x0F);
+    syx8[cfg_off + 1] = (cvRange << 4) | (midiChannel & 0x0F);
 
     const triggerLength = document.getElementById("global.triglen").value;
-    syx8[cfg_off + 6] = triggerLength;
+    syx8[cfg_off + 2] = triggerLength;
+    
+    write_channel_map(syx8, cfg_off + 4, "gate");
+    write_channel_map(syx8, cfg_off + 9, "cv");
 
     // gates
-    const gt_off = cfg_off + 8;
+    const gt_off = cfg_off + 14;
     for (let i = 0; i < 8; ++i) {
         var mode;
         var param;
@@ -423,7 +473,7 @@ function write_cfg_bytes(syx8) {
     }  
  
     // voltages
-    const cv_off = cfg_off + 24;
+    const cv_off = cfg_off + 30;
     for (let i = 0; i < 8; ++i) {
         var note_or_cc; 
         const id = i + 1;
@@ -480,10 +530,9 @@ function patch_sysex(syx8) {
     //debug_log("cfg_off: " + cfg_off + " cfg_line: " + cfg_line + " cfg_pos: " + cfg_pos);
     var patched_bytes = 0;
     // found the config block start, now patch it
-    const CONFIG_BYTES = 36;
-    for (let i = 0; i < CONFIG_BYTES; ) {
+    for (let i = 0; i < CONFIGURATION_LENGTH; ) {
         const avail = syx_line_length[cfg_line] - cfg_pos;
-        const todo = Math.min(avail, CONFIG_BYTES - i);
+        const todo = Math.min(avail, CONFIGURATION_LENGTH - i);
         //debug_log("todo: " + todo);
         for (let k = 0; k < todo; ++k) {
             const b = syx8[syx_cfg_offset + i + k];
@@ -499,7 +548,7 @@ function patch_sysex(syx8) {
             ++cfg_pos;
         }
         i += todo;
-        if (cfg_pos == syx_line_length[cfg_line] || i == CONFIG_BYTES) {
+        if (cfg_pos == syx_line_length[cfg_line] || i == CONFIGURATION_LENGTH) {
             //debug_log("fix_checksum line: " + cfg_line);
             fix_checksum(syx, cfg_line);
             ++cfg_line;
@@ -539,7 +588,7 @@ function download_sysex() {
     var syx8 = new Uint8Array(syx_bytes.slice());
     write_cfg_bytes(syx8);
     const out_syx = patch_sysex(syx8);
-    save("tram8_4x4_fw1_edit.syx", out_syx);
+    save(CONFIGURATION_FILENAME, out_syx);
 }
 </script>
 '''
@@ -552,7 +601,7 @@ htm += f'''
 <table>
 <tr>
 <td>&nbsp;&nbsp;&nbsp;</td>
-<td title="Select the input MIDI channel to use for all mapings'">MIDI Channel</td>
+<td title="Select the input MIDI channel to use for all mapings'">Default MIDI Channel</td>
 <td>&nbsp;&nbsp;&nbsp;</td>
 <td title="Select the millisecond duration for trigger outputs">Trigger Length</td>
 <td>&nbsp;&nbsp;&nbsp;</td>
@@ -560,11 +609,11 @@ htm += f'''
 </tr>
 <tr>
 <td></td>
-<td>{mkchan("global.channel", 1)}</td>
+<td>{mkchan("global.channel", 0)}</td>
 <td></td>
-<td>{mktrig("global.triglen", 1)}</td>
+<td>{mktrig("global.triglen", 0)}</td>
 <td></td>
-<td>{mkcvrange("global.cvrange", 5)}</td>
+<td>{mkcvrange("global.cvrange", 0)}</td>
 </tr>
 </table>
 '''
@@ -586,17 +635,13 @@ htm += f'''
 <td title="Select the activation source">Source</td>
 <td title="Note Number">Note</td>
 <td title="Clock: Number of ticks between activations">Clock Divider</td>
+<td title="Note: listen to custom channel number">Use Channel</td>
+<td title="Note: custom MIDI channel number">Channel</td>
 </tr>
 '''
 
-htm += mkgate_html(1, 1, 0, 36)
-htm += mkgate_html(2, 1, 0, 38)
-htm += mkgate_html(3, 1, 0, 42)
-htm += mkgate_html(4, 1, 0, 46)
-htm += mkgate_html(5, 1, 1, 0, 16)
-htm += mkgate_html(6, 1, 1, 0, 24)
-htm += mkgate_html(7, 2, 1, 0, 0)
-htm += mkgate_html(8, 3, 1, 0, 0)
+for i in incrange(1, 8):
+    htm += mkgate_html(i, 0, 0, 0)
 
 htm+='''
 <script language="javascript">
@@ -606,10 +651,20 @@ function CheckGateMode(id) {
 	if (d) {
 	   document.getElementById("gate" + id + ".note").disabled = d;
 	   document.getElementById("gate" + id + ".pulses").disabled = d;
+	   document.getElementById("gate" + id + ".usechan").disabled = d;
+	   document.getElementById("gate" + id + ".channel").disabled = d;
     } else {
 	   var isnote = (document.getElementById("gate" + id + ".src").value == 0);
 	   document.getElementById("gate" + id + ".note").disabled = !isnote;
 	   document.getElementById("gate" + id + ".pulses").disabled = isnote;
+	   if (isnote) {
+	       var uc = document.getElementById("gate" + id + ".usechan")
+	       uc.disabled = false;
+	       document.getElementById("gate" + id + ".channel").disabled = !uc.checked;
+	   } else {
+    	   document.getElementById("gate" + id + ".usechan").disabled = true;
+	       document.getElementById("gate" + id + ".channel").disabled = true;
+	   }
     }
 }
 '''
@@ -636,17 +691,13 @@ htm += '''
 <td title="Select CV Source">CV Source</td>
 <td title="Note Number">Note</td>
 <td title="CC number">CC Number</td>
+<td title="Listen to custom channel number">Use Channel</td>
+<td title="Custom MIDI channel number">Channel</td>
 </tr>
 '''
 
-htm += mkcv_html(1, 0, 36)
-htm += mkcv_html(2, 0, 38)
-htm += mkcv_html(3, 0, 42)
-htm += mkcv_html(4, 0, 46)
-htm += mkcv_html(5, 1, 0, 24)
-htm += mkcv_html(6, 1, 0, 29)
-htm += mkcv_html(7, 1, 0, 63)
-htm += mkcv_html(8, 1, 0, 82)
+for i in incrange(1, 8):
+    htm += mkcv_html(i, 0, 0, 0)
 
 htm+='''
 <script language="javascript">
@@ -654,6 +705,8 @@ function CheckVoltageSrc(id) {
 	const isnote = (document.getElementById("cv" + id + ".src").value == 0);
 	document.getElementById("cv" + id + ".note").disabled = !isnote;
 	document.getElementById("cv" + id + ".cc").disabled = isnote;
+	var uc = document.getElementById("cv" + id + ".usechan")
+	document.getElementById("cv" + id + ".channel").disabled = !uc.checked;
 }
 '''
 

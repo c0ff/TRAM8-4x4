@@ -46,11 +46,11 @@ enum HardwareConfigValues {
 
 //PROTOTYPES
 //void startupblink(void);
-void midi_learn(void);
+//void midi_learn(void);
 //void setup_process(void);
 //void init_interrupt_pins(void);
 void set_velocity(uint8_t ch, uint8_t velo);
-void set_default(void);
+//void set_default(void);
 void set_LED(uint8_t var);
 
 
@@ -99,7 +99,7 @@ void timer_init(void) {
 /* state globals */
 //uint16_t clock_tick = 0;
 
-enum { CONFIGURATION_FORMAT = 1 };
+enum { CONFIGURATION_FORMAT = 2 };
 
 // --- Gate outputs config
 
@@ -114,6 +114,7 @@ enum GateFlags {
 };
 
 struct GateState {
+    uint8_t midi_channel;
     uint8_t flags;
     uint8_t param;
     union {
@@ -134,26 +135,40 @@ enum VoltageFlags {
 };
 
 struct VoltageState {
+    uint8_t midi_channel;
     uint8_t note_or_cc; // 0x00 | Note num or 0x80 | CC num
 };
 
-// --- default config settings (36 bytes))
-uint8_t cfg[4+ 4+8*2+8*1 +4] = {
+// --- default config settings
+uint8_t cfg[46] = {
     // head marker
     0x90, 0x0d, 0xf0, 0x0d, // good food
 
+    // Offset: 4
     // common config
     CONFIGURATION_FORMAT, // version
-    (1 << 4) | 9, // CV range 8V, (0 = 5V), MIDI channel number (0-15)
+    (1 << 4) | 9, // CV range 8V, (0 = 5V), default MIDI channel number (0-15)
     10, // default trigger length in ms
-    0, // reserved
+    0, // reserved (TODO: when in 8V mode, bits mark outputs scaled to 5V)
     
+    // Offset: 8
+    // MIDI Channel mappings
+    
+    // Gate outputs MIDI channel map
+    0, // each bit marks which gate uses a non-default MIDI-channel
+    0,0,0,0,// each 4-bit group sets custom MIDI channel for a gate out.
+
+    // Voltage outputs MIDI channel map
+    0, // each bit marks which CV uses a non-default MIDI-channel
+    0,0,0,0,// each 4-bit group sets custom MIDI channel for a CV out.
+
+    // Offset: 18
     // 8 gates (2 bytes per gate)
     GateMode_Trigger | GateSource_Note,  36, // TR-8S BD
     GateMode_Trigger | GateSource_Note,  38, // TR-8S SD
     GateMode_Trigger | GateSource_Note,  42, // TR-8S CH
     GateMode_Trigger | GateSource_Note,  46, // TR-8S OH
-    GateMode_Trigger | GateSource_Clock, 16, // 2/3 ppqn
+    GateMode_Trigger | GateSource_Clock, 32, // 2/3 ppqn
     GateMode_Trigger | GateSource_Clock, 24, // 1 ppqn
     GateMode_Gate    | GateSource_Clock,  0, // RUN gate
     GateMode_Trigger | GateSource_Clock,  0, // RESET trigger
@@ -168,7 +183,7 @@ uint8_t cfg[4+ 4+8*2+8*1 +4] = {
     VoltageSource_ControlChange | 63, // TR-8S CH Level
     VoltageSource_ControlChange | 82, // TR-8S OH Level
     
-    // tail markrer
+    // tail marker
     0xba, 0xad, 0xf0, 0x0d, // baad food
 };
 
@@ -177,17 +192,18 @@ struct VoltageState voltages[NUM_OUT_VOLTAGES] = {};
 
 void show_error();
 int parse_settings();
+void parse_channel_mapping(const uint8_t* chmap, uint8_t* midi_chan, uint8_t step);
 
 void gates_tick_update();
 
 void gates_midi_reset(uint8_t reset_pulse_counters);
 void gates_midi_pulse();
 void gates_midi_stop();
-void gates_noteon(uint8_t note);
-void gates_noteoff(uint8_t note);
+void gates_noteon(uint8_t chan, uint8_t note);
+void gates_noteoff(uint8_t chan, uint8_t note);
 void gates_allnotesoff();
 
-void voltage_note_or_cc(uint8_t note_or_cc, uint8_t val);
+void voltage_note_or_cc(uint8_t chan, uint8_t note_or_cc, uint8_t val);
 
 uint8_t eight_volts = 1;
 uint8_t trigger_ticks = 10;
@@ -198,19 +214,19 @@ uint8_t midi_cmd_data[3];
 
 /* MIDI GLOBALS */
 
-uint8_t midi_note_map[8] = {60,61,62,63,64,65,66,67};
-uint8_t midi_note_map_default[8] = {60,61,62,63,64,65,66,67};
+//uint8_t midi_note_map[8] = {60,61,62,63,64,65,66,67};
+//uint8_t midi_note_map_default[8] = {60,61,62,63,64,65,66,67};
 
-uint8_t midi_channel = 9;
-uint8_t midi_learn_mode = 0;
-uint8_t midi_learn_current = 0;
+uint8_t global_midi_channel = 9;
+//uint8_t midi_learn_mode = 0;
+//uint8_t midi_learn_current = 0;
 
-uint8_t module_mode = MODE_VELOCITY;
+//uint8_t module_mode = MODE_VELOCITY;
 
-uint8_t velocity_out = 0;
+//uint8_t velocity_out = 0;
 
-uint16_t setting_wait_counter = 0;
-uint8_t setting_wait_flag = 0;
+//uint16_t setting_wait_counter = 0;
+//uint8_t setting_wait_flag = 0;
 
 //POINTER MANIPULATION 
 void  (*set_pin_ptr)(uint8_t ) = & set_pin_inv;
@@ -227,6 +243,19 @@ void show_error()
     }
 }
 
+void parse_channel_mapping(const uint8_t* chmap, uint8_t* midi_chan, uint8_t step)
+{
+    uint8_t chmask = *chmap++;
+    for (uint8_t i = 0; i < 8; ++i)
+    {
+        if (chmask & (1 << i))
+            *midi_chan = (chmap[i >> 1] >> ((i & 1) ? 4 : 0)) & 0x0F;
+        else
+            *midi_chan = global_midi_channel;
+        midi_chan += step;
+    }
+}
+
 int parse_settings()
 {
     if (cfg[0] != 0x90 || cfg[1] != 0x0D || cfg[2] != 0xF0 || cfg[3] != 0x0D)
@@ -234,11 +263,15 @@ int parse_settings()
     if (cfg[4] != CONFIGURATION_FORMAT)
         return 0;
     eight_volts = (cfg[5] >> 4) & 0x01;
-    midi_channel = cfg[5] & 0x0F;
+    global_midi_channel = cfg[5] & 0x0F;
     trigger_ticks = cfg[6];
     // cfg[7] reserved
     
-    const uint8_t gate_cfg_off = 8;
+    const uint8_t chan_map_off = 8;
+    parse_channel_mapping(cfg + chan_map_off + 0, &gates[0].midi_channel, sizeof(gates[0]));
+    parse_channel_mapping(cfg + chan_map_off + 5, &voltages[0].midi_channel, sizeof(voltages[0]));
+    
+    const uint8_t gate_cfg_off = 18;
     for (uint8_t i = 0; i < NUM_OUT_GATES; ++i)
     {
         gates[i].flags = cfg[gate_cfg_off + i*2 + 0];
@@ -317,6 +350,7 @@ int main(void)
 	UBRRL = (unsigned char) MYUBRR;
 	
 /* LOAD MIDI MAP FROM EEPROM*/
+#if 0
 	do {} while (!eeprom_is_ready());
 	//load Channel 
 	midi_channel = eeprom_read_byte(EEPROM_CHANNEL_ADDR);
@@ -326,13 +360,12 @@ int main(void)
 	do {} while (!eeprom_is_ready());
 	//load Channel
 	module_mode = eeprom_read_byte(EEPROM_MODE_ADDR);	
-	
-	
-	
+		
 	do {} while (!eeprom_is_ready());
 	//set map to default if never learned:
 	if (midi_note_map[0]==0xFF)
 		set_default();
+#endif
 
 	
 /* CHECK FOR EXPANDERS */
@@ -341,7 +374,7 @@ int main(void)
 	PORTC = (1 << PC2)|(1 << PC3);	
 	DDRC  |= (1 << PC2)|(1 << PC3);
 	
-	velocity_out = test_max5825();	//Velocity Out Expander present? (a.k.a. WK4) 
+	//const uint8_t velocity_out = test_max5825();	//Velocity Out Expander present? (a.k.a. WK4) 
 
 	if (!parse_settings())
 	   show_error();
@@ -380,7 +413,7 @@ int main(void)
 		(*clear_pin_ptr)(7);
 
 
-	midi_learn_mode = 0;
+	//midi_learn_mode = 0;
 	midi_cmd_len = 0;
 	midi_clock_run = 0;
 	
@@ -395,13 +428,12 @@ int main(void)
 	
 /* MAIN LOOP */	
     while (1) {
-	
+#if 0
 	static uint8_t learn_button = BUTTON_UP;
 	static uint8_t button_now = 0;
 	static uint8_t button_bounce = 0;
 	static uint8_t button_last = 0;
 	
-
 	//CHECK FOR GOTO SETTINGS MENU - LEARN BUTTON HAS TO BE DOWN FOR 3 SEC 
 	if ((learn_button == BUTTON_RELEASED)){
 		setting_wait_counter = 0;
@@ -433,7 +465,7 @@ int main(void)
 			}
 		}
 	}
-		
+#endif		
 	
 
 	/************************************************************************/
@@ -444,7 +476,7 @@ int main(void)
 			//keyscan(&buttons);
 			TCNT2 = 0; //reset timer
 			TIFR |= (1 << OCF2); //reset flag		
-			
+#if 0			
 			button_now = PINC & (1 << BUTTON_PIN);
 			
 			if (button_now != button_bounce){
@@ -467,6 +499,7 @@ int main(void)
 
 			if(setting_wait_flag == 1)
 				setting_wait_counter++; 
+#endif
 		}
 	 }
 }
@@ -474,8 +507,7 @@ int main(void)
 /************************************************************************/
 /*						 MIDI LEARN			                            */
 /************************************************************************/
-
-
+#if 0
 void midi_learn(void)
 {	
 	static uint8_t learn_button = BUTTON_UP;
@@ -627,7 +659,7 @@ void midi_learn(void)
 
 void set_default(void){
 	//MIDI
-	midi_channel = 9;
+	global_midi_channel = 9;
 	module_mode = MODE_VELOCITY;
 	memcpy(&midi_note_map,&midi_note_map_default,8);
 	////clock divider
@@ -661,9 +693,9 @@ void set_default(void){
 	////load map
 	////	eeprom_read_block(&midi_note_map,EEPROM_MAP_ADDR,8);
 	//eeprom_write_block(&presets,EEPROM_PRESET_ADDR,sizeof(sys_presets));
-	
 	return;
 }
+#endif
 
 ISR(TIMER2_COMP_vect)
 {
@@ -682,37 +714,39 @@ void midi_realtime(uint8_t msg)
 	       gates_midi_stop();
 }
 
-void midi_command(uint8_t msg, uint8_t ctl, uint8_t val)
+void midi_command(uint8_t status, uint8_t ctl, uint8_t val)
 {
+    const uint8_t msg = status & MIDI_COMMAND_MASK;
+    const uint8_t chan = status & MIDI_CHANNEL_MASK;
+
     if (msg == MIDI_MSG_NOTE_OFF)
     {
         //voltage_note_or_cc(ctl, val);
-        gates_noteoff(ctl);
+        gates_noteoff(chan, ctl);
     }
     else if (msg == MIDI_MSG_NOTE_ON)
     {
         if (val != 0)
         {
-            voltage_note_or_cc(ctl, val);
-            gates_noteon(ctl);
+            voltage_note_or_cc(chan, ctl, val);
+            gates_noteon(chan, ctl);
         }
         else
-            gates_noteoff(ctl);
+            gates_noteoff(chan, ctl);
     }
     else if (msg == MIDI_MSG_CONTROL_CHANGE) // Control Change
     {
         if (ctl == MIDI_CC_ALL_NOTES_OFF || ctl == MIDI_CC_ALL_SOUNDS_OFF)
             gates_allnotesoff();
         else
-            voltage_note_or_cc(ctl | VoltageSource_ControlChange, val);
+            voltage_note_or_cc(chan, ctl | VoltageSource_ControlChange, val);
     }
 }
 
 /* MIDI RECEIVER */
 ISR(USART_RXC_vect)
 {
-	uint8_t uart_data;
-	uart_data = UDR;
+	const uint8_t uart_data = UDR;
 	
 	if (uart_data & MIDI_STATUS_MASK) // command byte
 	{
@@ -723,17 +757,13 @@ ISR(USART_RXC_vect)
 	   else
 	   {
     	   const uint8_t msg_type = uart_data & MIDI_COMMAND_MASK;
-    	   midi_cmd_len = 0;
+    	   midi_cmd_len = 0; // reset Running Status
     	   if (msg_type == MIDI_MSG_NOTE_ON
     	       || msg_type == MIDI_MSG_NOTE_OFF
     	       || msg_type == MIDI_MSG_CONTROL_CHANGE)
     	   {
-    	       const uint8_t channel = uart_data & MIDI_CHANNEL_MASK;
-    	       if (channel == midi_channel)
-    	       {
-    	           midi_cmd_data[0] = msg_type;
-    	           midi_cmd_len = 1;
-    	       }
+	           midi_cmd_data[0] = uart_data;
+	           midi_cmd_len = 1;
     	   }
 	   }
 	}
@@ -750,8 +780,7 @@ ISR(USART_RXC_vect)
 
 void gates_tick_update()
 {
-    uint8_t i;
-    for (i = 0; i < NUM_OUT_GATES; ++i)
+    for (uint8_t i = 0; i < NUM_OUT_GATES; ++i)
         if ((gates[i].flags & GateMode_MASK) == GateMode_Trigger)
             if (gates[i].ticks_until_clear)
                 if (--gates[i].ticks_until_clear == 0)
@@ -855,23 +884,23 @@ void gates_allnotesoff()
 }
 
 
-void gates_noteoff(uint8_t note)
+void gates_noteoff(uint8_t chan, uint8_t note)
 {
     uint8_t i;
     for (i = 0; i < NUM_OUT_GATES; ++i)
         if (gates[i].flags == (GateMode_Gate | GateSource_Note))
-            if (gates[i].param == note)
+            if (gates[i].param == note && gates[i].midi_channel == chan)
                 (*clear_pin_ptr)(i);           
 }
 
-void gates_noteon(uint8_t note)
+void gates_noteon(uint8_t chan, uint8_t note)
 {
     uint8_t i;
     for (i = 0; i < NUM_OUT_GATES; ++i)
     {
         const uint8_t gate_flags = gates[i].flags;
         if ((gates[i].flags & GateSource_MASK) == GateSource_Note)
-            if (gates[i].param == note)
+            if (gates[i].param == note && gates[i].midi_channel == chan)
             {
                 (*set_pin_ptr)(i);
                 if ((gate_flags & GateMode_MASK) == GateMode_Trigger)
@@ -880,11 +909,11 @@ void gates_noteon(uint8_t note)
     }
 }
 
-void voltage_note_or_cc(uint8_t note_or_cc, uint8_t val)
+void voltage_note_or_cc(uint8_t chan, uint8_t note_or_cc, uint8_t val)
 {
     uint8_t i;
     for (i = 0; i < NUM_OUT_VOLTAGES; ++i)
-        if (voltages[i].note_or_cc == note_or_cc)
+        if (voltages[i].note_or_cc == note_or_cc && voltages[i].midi_channel == chan)
             max5825_set_load_channel(7 - i, velocity_lookup[val & 0x7F]);
 }
 
