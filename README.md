@@ -72,7 +72,7 @@ Starting from editor **1 rev.A** the default 4x4 firmware is embedded into HTML 
  2. Trigger on NoteOn 38 // TR-8S SD
  3. Trigger on NoteOn 42 // TR-8S CH
  4. Trigger on NoteOn 46 // TR-8S OH
- 5. Trigger on triplets (32 MIDI pulses) // 4/3 ppqn
+ 5. Trigger on triplets (36 MIDI pulses) // 4/3 ppqn
  6. Trigger on quarters (24 MIDI pulses) // 1 ppqn
  7. Gate on MIDI START/CONT until STOP   // RUN gate
  8. Reset trigger on MIDI START/STOP     // RESET trigger
