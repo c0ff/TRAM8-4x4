@@ -72,7 +72,7 @@ Starting from editor **1 rev.A** the default 4x4 firmware is embedded into HTML 
  2. Trigger on NoteOn 38 // TR-8S SD
  3. Trigger on NoteOn 42 // TR-8S CH
  4. Trigger on NoteOn 46 // TR-8S OH
- 5. Trigger on triplets (16 MIDI pulses) // 2/3 ppqn
+ 5. Trigger on triplets (32 MIDI pulses) // 4/3 ppqn
  6. Trigger on quarters (24 MIDI pulses) // 1 ppqn
  7. Gate on MIDI START/CONT until STOP   // RUN gate
  8. Reset trigger on MIDI START/STOP     // RESET trigger
@@ -91,9 +91,10 @@ Starting from editor **1 rev.A** the default 4x4 firmware is embedded into HTML 
  ## Ideas for future development:
   - Clock divider in quarters, not only in pulses. Quarters will allow for up to 32 bars for a flip-flop phase, i.e. square LFO with periods up to 64 bars long.
   - Note Gate and Note Dynamic Gate modes for CV outputs, to replicate the SixteenGates firmware
-  - More MIDI messages: Pitchbend, Channel Aftertouch ...
+  - More MIDI messages: Pitchbend, Channel Pressure, Aftertouch ...
   - Add names for more Well-Known Controllers. At the moment it is only 6 (ModWheel)
-  - Support both 8V and 5V ranges per-output
+  - Support both 8V and 5V ranges at the same time with per-output selection
+  - Support All Controllers Off message
   - ... your ideas are welcome!
 
 
