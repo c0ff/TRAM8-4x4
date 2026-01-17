@@ -168,7 +168,7 @@ uint8_t cfg[46] = {
     GateMode_Trigger | GateSource_Note,  38, // TR-8S SD
     GateMode_Trigger | GateSource_Note,  42, // TR-8S CH
     GateMode_Trigger | GateSource_Note,  46, // TR-8S OH
-    GateMode_Trigger | GateSource_Clock, 36, // 4/3 ppqn
+    GateMode_Trigger | GateSource_Clock, 32, // 4/3 ppqn
     GateMode_Trigger | GateSource_Clock, 24, // 1 ppqn
     GateMode_Gate    | GateSource_Clock,  0, // RUN gate
     GateMode_Trigger | GateSource_Clock,  0, // RESET trigger
