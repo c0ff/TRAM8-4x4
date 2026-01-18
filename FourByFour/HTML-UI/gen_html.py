@@ -417,19 +417,22 @@ function load_sysex(inp) {
 // writing config
 function write_channel_map(syx8, map_off, ctl_type) {
     var usemask = 0;
+    var chans = new Uint8Array(8);
     for (let i = 0; i < 8; ++i) {
         const id = i + 1;
         const usechan = document.getElementById(ctl_type + id + ".usechan").checked;
         if (usechan)
+        {
             usemask |= 1 << i;
-        const chan = document.getElementById(ctl_type + id + ".channel").value - 1;
-        const chan_shift = (i & 1) ? 4 : 0;
-        const chan_off = map_off + 1 + (i >> 1);
-        syx8[chan_off] &= 0x0F << chan_shift; // clear
-        if (usechan)
-            syx8[chan_off] |= (chan & 0x0F) << chan_shift; // set
+            chans[i] = document.getElementById(ctl_type + id + ".channel").value - 1;
+        }
+        else
+            chans[i] = 0;
     }
+
     syx8[map_off] = usemask;
+    for (let i = 0; i < 4; ++i)
+        syx8[map_off + 1 + i] = ((chans[i*2 + 1] & 0x0F) << 4) | (chans[i*2 + 0] & 0x0F);
 }
 
 function write_cfg_bytes(syx8) {

@@ -1,6 +1,6 @@
 # TRAM8 Module 4x4 Firmware
 
-## v2 Features:
+## v3 Features:
 
  - Offline HTML-based configuration editor
  - Configurable global MIDI channel
@@ -10,7 +10,7 @@
  - Configurable global trigger length (1 - 120 ms)
  - Gate/Trigger sources: Note On, MIDI Clock divisors, RUN gate, Reset trigger
  - Gate output from Clock divisor works as a flip-flop (square LFO)
- - CV sources: Note Velocity, Controller Value (CC)
+ - CV output modes: Controller Value (CC), Note Velocity, Note Gate, Note Dynamic Gate (Gate x Velocity)
  - Supports All Sound Off and All Notes Off messages
  - **No learn mode at the moment**
 
@@ -20,9 +20,9 @@ Timer code for 1ms ticks from https://github.com/thorinf/tram8-plus/
 
 
 ## To use:
- - Download and open locally `FW-4x4 HTML FILES/tram8_4x4_fw2.html`
- - Edit the settings to your liking and get the `tram8_4x4_fw2_edit.syx`
- - Send the `tram8_4x4_fw2_edit.syx` to your Tram8 module in the update mode
+ - Download and open locally `FW-4x4 HTML FILES/tram8_4x4_fw3.html`
+ - Edit the settings to your liking and get the `tram8_4x4_fw3_edit.syx`
+ - Send the `tram8_4x4_fw3_edit.syx` to your Tram8 module in the update mode
  - Enjoy!
 
 
@@ -90,7 +90,6 @@ Starting from editor **1 rev.A** the default 4x4 firmware is embedded into HTML 
 
  ## Ideas for future development:
   - Clock divider in quarters, not only in pulses. Quarters will allow for up to 32 bars for a flip-flop phase, i.e. square LFO with periods up to 64 bars long.
-  - Note Gate and Note Dynamic Gate modes for CV outputs, to replicate the SixteenGates firmware
   - More MIDI messages: Pitchbend, Channel Pressure, Aftertouch ...
   - Add names for more Well-Known Controllers. At the moment it is only 6 (ModWheel)
   - Support both 8V and 5V ranges at the same time with per-output selection
