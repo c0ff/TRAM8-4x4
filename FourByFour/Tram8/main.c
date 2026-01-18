@@ -203,7 +203,9 @@ void gates_noteon(uint8_t chan, uint8_t note);
 void gates_noteoff(uint8_t chan, uint8_t note);
 void gates_allnotesoff();
 
-void voltage_note_or_cc(uint8_t chan, uint8_t note_or_cc, uint8_t val);
+void voltage_noteon(uint8_t chan, uint8_t note, uint8_t vel);
+void voltage_noteoff(uint8_t chan, uint8_t note);
+void voltage_cc_value(uint8_t chan, uint8_t ctl, uint8_t val);
 
 uint8_t eight_volts = 1;
 uint8_t trigger_ticks = 10;
@@ -721,25 +723,28 @@ void midi_command(uint8_t status, uint8_t ctl, uint8_t val)
 
     if (msg == MIDI_MSG_NOTE_OFF)
     {
-        //voltage_note_or_cc(ctl, val);
+        voltage_noteoff(chan, ctl);
         gates_noteoff(chan, ctl);
     }
     else if (msg == MIDI_MSG_NOTE_ON)
     {
         if (val != 0)
         {
-            voltage_note_or_cc(chan, ctl, val);
+            voltage_noteon(chan, ctl, val);
             gates_noteon(chan, ctl);
         }
         else
+        {
             gates_noteoff(chan, ctl);
+            voltage_noteoff(chan, ctl);
+        }
     }
     else if (msg == MIDI_MSG_CONTROL_CHANGE) // Control Change
     {
         if (ctl == MIDI_CC_ALL_NOTES_OFF || ctl == MIDI_CC_ALL_SOUNDS_OFF)
             gates_allnotesoff();
         else
-            voltage_note_or_cc(chan, ctl | VoltageSource_ControlChange, val);
+            voltage_cc_value(chan, ctl, val);
     }
 }
 
@@ -909,10 +914,21 @@ void gates_noteon(uint8_t chan, uint8_t note)
     }
 }
 
-void voltage_note_or_cc(uint8_t chan, uint8_t note_or_cc, uint8_t val)
+void voltage_noteon(uint8_t chan, uint8_t note, uint8_t vel)
 {
-    uint8_t i;
-    for (i = 0; i < NUM_OUT_VOLTAGES; ++i)
+    for (uint8_t i = 0; i < NUM_OUT_VOLTAGES; ++i)
+        if (voltages[i].note_or_cc == note && voltages[i].midi_channel == chan)
+            max5825_set_load_channel(7 - i, velocity_lookup[vel & 0x7F]);
+}
+
+void voltage_noteoff(uint8_t /*chan*/, uint8_t /*note*/)
+{
+}
+
+void voltage_cc_value(uint8_t chan, uint8_t ctl, uint8_t val)
+{
+    const uint8_t note_or_cc = (ctl | VoltageSource_ControlChange);
+    for (uint8_t i = 0; i < NUM_OUT_VOLTAGES; ++i)
         if (voltages[i].note_or_cc == note_or_cc && voltages[i].midi_channel == chan)
             max5825_set_load_channel(7 - i, velocity_lookup[val & 0x7F]);
 }
