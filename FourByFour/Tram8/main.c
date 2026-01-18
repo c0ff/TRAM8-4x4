@@ -97,9 +97,7 @@ void timer_init(void) {
 }
 
 /* state globals */
-//uint16_t clock_tick = 0;
-
-enum { CONFIGURATION_FORMAT = 2 };
+enum { CONFIGURATION_FORMAT = 3 };
 
 // --- Gate outputs config
 
@@ -114,8 +112,8 @@ enum GateFlags {
 };
 
 struct GateState {
-    uint8_t midi_channel;
-    uint8_t flags;
+    uint8_t midi_channel; // 4 bits
+    uint8_t flags; // 2 bits
     uint8_t param;
     union {
         uint8_t ticks_until_clear;
@@ -125,22 +123,21 @@ struct GateState {
 };
 
 // --- CV outputs config
-
 enum VoltageFlags {
-    VoltageSource_NoteVelocity = 0,
-    VoltageSource_ControlChange = 0x80,
-    VoltageSource_MASK = 0x80,
-    
-    VoltageSource_Number_MASK = 0x7F,
+    VoltageSource_ControlChange = 0,
+    VoltageSource_NoteVelocity = 1,
+    VoltageSource_NoteGate = 2,
+    VoltageSource_NoteVelocityGate = VoltageSource_NoteVelocity | VoltageSource_NoteGate, // 3 
 };
 
 struct VoltageState {
-    uint8_t midi_channel;
-    uint8_t note_or_cc; // 0x00 | Note num or 0x80 | CC num
+    uint8_t midi_channel; // 4 bits
+    uint8_t flags; // VoltageSource, 2 bits
+    uint8_t param; // Note or Controller number 7 bits
 };
 
 // --- default config settings
-uint8_t cfg[46] = {
+uint8_t cfg[54] = {
     // head marker
     0x90, 0x0d, 0xf0, 0x0d, // good food
 
@@ -173,15 +170,15 @@ uint8_t cfg[46] = {
     GateMode_Gate    | GateSource_Clock,  0, // RUN gate
     GateMode_Trigger | GateSource_Clock,  0, // RESET trigger
     
-    // 8 CVs (1 byte per CV)
-    VoltageSource_NoteVelocity | 36, // TR-8S BD
-    VoltageSource_NoteVelocity | 38, // TR-8S SD
-    VoltageSource_NoteVelocity | 42, // TR-8S CH
-    VoltageSource_NoteVelocity | 46, // TR-8S OH
-    VoltageSource_ControlChange | 24, // TR-8S BD Level
-    VoltageSource_ControlChange | 29, // TR-8S SD Level
-    VoltageSource_ControlChange | 63, // TR-8S CH Level
-    VoltageSource_ControlChange | 82, // TR-8S OH Level
+    // 8 CVs (2 byte per CV)
+    VoltageSource_NoteVelocity, 36, // TR-8S BD
+    VoltageSource_NoteVelocity, 38, // TR-8S SD
+    VoltageSource_NoteVelocity, 42, // TR-8S CH
+    VoltageSource_NoteVelocity, 46, // TR-8S OH
+    VoltageSource_ControlChange, 24, // TR-8S BD Level
+    VoltageSource_ControlChange, 29, // TR-8S SD Level
+    VoltageSource_ControlChange, 63, // TR-8S CH Level
+    VoltageSource_ControlChange, 82, // TR-8S OH Level
     
     // tail marker
     0xba, 0xad, 0xf0, 0x0d, // baad food
@@ -206,6 +203,7 @@ void gates_allnotesoff();
 void voltage_noteon(uint8_t chan, uint8_t note, uint8_t vel);
 void voltage_noteoff(uint8_t chan, uint8_t note);
 void voltage_cc_value(uint8_t chan, uint8_t ctl, uint8_t val);
+void voltage_allnotesoff();
 
 uint8_t eight_volts = 1;
 uint8_t trigger_ticks = 10;
@@ -284,9 +282,12 @@ int parse_settings()
     
     const uint8_t cv_cfg_off = gate_cfg_off + NUM_OUT_GATES * 2;
     for (uint8_t i = 0; i < NUM_OUT_VOLTAGES; ++i)
-        voltages[i].note_or_cc = cfg[cv_cfg_off + i];
+    {
+        voltages[i].flags = cfg[cv_cfg_off + i*2 + 0];
+        voltages[i].param = cfg[cv_cfg_off + i*2 + 1];
+    }
         
-    const uint8_t tail_off = cv_cfg_off + NUM_OUT_VOLTAGES;
+    const uint8_t tail_off = cv_cfg_off + NUM_OUT_VOLTAGES * 2;
     if (cfg[tail_off] != 0xBA || cfg[tail_off+1] != 0xAD
         || cfg[tail_off+2] != 0xF0 || cfg[tail_off+3] != 0x0D)
         return 0;
@@ -917,20 +918,38 @@ void gates_noteon(uint8_t chan, uint8_t note)
 void voltage_noteon(uint8_t chan, uint8_t note, uint8_t vel)
 {
     for (uint8_t i = 0; i < NUM_OUT_VOLTAGES; ++i)
-        if (voltages[i].note_or_cc == note && voltages[i].midi_channel == chan)
-            max5825_set_load_channel(7 - i, velocity_lookup[vel & 0x7F]);
+        if (voltages[i].param == note && voltages[i].midi_channel == chan)
+        {
+            const uint8_t flags = voltages[i].flags;
+            if (flags & VoltageSource_NoteVelocityGate)
+            {
+                const uint8_t outval = (flags & VoltageSource_NoteVelocity) ? vel : 0x7F;
+                max5825_set_load_channel(7 - i, velocity_lookup[outval & 0x7F]);
+            }
+        }
 }
 
-void voltage_noteoff(uint8_t /*chan*/, uint8_t /*note*/)
+void voltage_noteoff(uint8_t chan, uint8_t note)
 {
+    for (uint8_t i = 0; i < NUM_OUT_VOLTAGES; ++i)
+        if (voltages[i].param == note && voltages[i].midi_channel == chan)
+            if (voltages[i].flags & VoltageSource_NoteGate)
+                max5825_set_load_channel(7 - i, velocity_lookup[0]);
 }
 
 void voltage_cc_value(uint8_t chan, uint8_t ctl, uint8_t val)
 {
-    const uint8_t note_or_cc = (ctl | VoltageSource_ControlChange);
     for (uint8_t i = 0; i < NUM_OUT_VOLTAGES; ++i)
-        if (voltages[i].note_or_cc == note_or_cc && voltages[i].midi_channel == chan)
-            max5825_set_load_channel(7 - i, velocity_lookup[val & 0x7F]);
+        if (voltages[i].flags == VoltageSource_ControlChange && voltages[i].midi_channel == chan)
+            if (voltages[i].param == ctl)
+                max5825_set_load_channel(7 - i, velocity_lookup[val & 0x7F]);
+}
+
+void voltage_allnotesoff()
+{
+    for (uint8_t i = 0; i < NUM_OUT_VOLTAGES; ++i)
+        if (voltages[i].flags & VoltageSource_NoteGate)
+            max5825_set_load_channel(7 - i, velocity_lookup[0]);
 }
 
 void set_LED(uint8_t var){

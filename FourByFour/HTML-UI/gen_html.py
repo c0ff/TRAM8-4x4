@@ -9,8 +9,10 @@
 import argparse
 import binascii
 
-CONFIGURATION_FORMAT = 2
-CONFIGURATION_LENGTH = 46
+CONFIGURATION_FORMAT = 3
+CONFIGURATION_LENGTH = 54
+
+CONFIGURATION_FN_PREFIX = f'tram8_4x4_fw{CONFIGURATION_FORMAT}'
 
 def incrange(start, incl_end, step=1):
     return list(range(start, incl_end + step, step))
@@ -109,7 +111,7 @@ def mkcvrange(name, def_val):
     return out
 
 def mkcvsrc(name, def_val):
-    vals=[('Note Velocity', 0), ('Control Change', 1)]
+    vals=[('Control Change', 0), ('Note Velocity', 1), ('Note Gate', 2), ('Note Dynamic Gate', 3)]
     out = f'<select name="{name}" id="{name}">\n'
     for v,i in vals:
         sel = ' selected' if i == def_val else ''
@@ -145,7 +147,7 @@ htm = '''
 
 htm += f'''
 <b>LPZW Tram8 4x4 Firmware.</b> Configuration Format: {CONFIGURATION_FORMAT}<br />
-<i>tram8_4x4_fw2.syx loaded by default.</i><br />
+<i>{CONFIGURATION_FN_PREFIX}.syx loaded by default.</i><br />
 '''
 
 htm += '''
@@ -166,7 +168,7 @@ For updates visit:
 htm += f'''
 const CONFIGURATION_FORMAT = {CONFIGURATION_FORMAT};
 const CONFIGURATION_LENGTH = {CONFIGURATION_LENGTH};
-const CONFIGURATION_FILENAME = "tram8_4x4_fw{CONFIGURATION_FORMAT}_edit.syx";
+const CONFIGURATION_FILENAME = "{CONFIGURATION_FN_PREFIX}_edit.syx";
 '''
 
 htm += '''
@@ -367,16 +369,14 @@ function parse_cfg(syx8) {
     // voltages
     const cv_off = cfg_off + 30;
     for (let i = 0; i < 8; ++i) {
-        const note_or_cc = syx8[cv_off + i];
-        const isnote = (note_or_cc < 0x80);
+        const mode  = syx8[cv_off + i*2 + 0];
+        const param = syx8[cv_off + i*2 + 1];
         const id = i + 1;
-        if (isnote) {
-            document.getElementById("cv" + id + ".src").value = 0;
-    	    document.getElementById("cv" + id + ".note").value = note_or_cc;
-        } else { 
-            document.getElementById("cv" + id + ".src").value = 1;
-	        document.getElementById("cv" + id + ".cc").value = note_or_cc & 0x7F;
-	    }
+        document.getElementById("cv" + id + ".src").value = mode;
+        if (mode > 0)
+    	    document.getElementById("cv" + id + ".note").value = param;
+    	else
+	        document.getElementById("cv" + id + ".cc").value = param;
 	    CheckVoltageSrc(id);
     }
 }
@@ -475,14 +475,15 @@ function write_cfg_bytes(syx8) {
     // voltages
     const cv_off = cfg_off + 30;
     for (let i = 0; i < 8; ++i) {
-        var note_or_cc; 
         const id = i + 1;
-        const isnote = (document.getElementById("cv" + id + ".src").value == 0);
-        if (isnote)
-    	    note_or_cc = document.getElementById("cv" + id + ".note").value;
+        const mode = document.getElementById("cv" + id + ".src").value;
+        var param;
+        if (mode > 0)
+    	    param = document.getElementById("cv" + id + ".note").value;
         else
-    	    note_or_cc = document.getElementById("cv" + id + ".cc").value | 0x80;
-	    syx8[cv_off + i] = note_or_cc;
+    	    param = document.getElementById("cv" + id + ".cc").value;
+        syx8[cv_off + i*2 + 0] = mode;
+        syx8[cv_off + i*2 + 1] = param;
     }
 }
 
@@ -702,7 +703,7 @@ for i in incrange(1, 8):
 htm+='''
 <script language="javascript">
 function CheckVoltageSrc(id) {
-	const isnote = (document.getElementById("cv" + id + ".src").value == 0);
+	const isnote = (document.getElementById("cv" + id + ".src").value > 0);
 	document.getElementById("cv" + id + ".note").disabled = !isnote;
 	document.getElementById("cv" + id + ".cc").disabled = isnote;
 	var uc = document.getElementById("cv" + id + ".usechan")
