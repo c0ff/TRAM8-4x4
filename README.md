@@ -1,5 +1,7 @@
 # TRAM8 Module 4x4 Firmware
 
+Go to SysEx configurator: https://c0ff.github.io/TRAM8-4x4/tram8_4x4_fw3.html
+
 ## v3 Features:
 
  - Offline HTML-based configuration editor
