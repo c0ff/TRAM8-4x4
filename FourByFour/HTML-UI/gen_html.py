@@ -9,7 +9,7 @@
 import argparse
 import binascii
 
-CONFIGURATION_FORMAT = 3
+CONFIGURATION_FORMAT = 4
 CONFIGURATION_LENGTH = 54
 
 CONFIGURATION_FN_PREFIX = f'tram8_4x4_fw{CONFIGURATION_FORMAT}'
@@ -132,6 +132,9 @@ def mkcv_js(id):
            f'document.getElementById("cv{id}.usechan").onchange=function(){{CheckVoltageSrc({id});}};\n'+\
            f'//CheckVoltageSrc({id});\n\n'
 
+
+def mkglobalbool(name):
+    return f'<input type="checkbox" name="{name}" id="{name}" />'
 
 # header
 htm = '''
@@ -325,7 +328,7 @@ function parse_cfg(syx8) {
     if (ver != CONFIGURATION_FORMAT)
         return report_bad("Unsupported configuration format: " + ver);
 
-    const cvRange = syx8[cfg_off + 1] >> 4;
+    const cvRange = syx8[cfg_off + 1] & 0x10;
     if (cvRange)
         document.getElementById("global.cvrange").value = 8;
     else
@@ -333,6 +336,9 @@ function parse_cfg(syx8) {
     
     const midiChannel = (syx8[cfg_off + 1] & 0x0F) + 1;
     document.getElementById("global.channel").value = midiChannel;
+    
+    const resetOnContinue = syx8[cfg_off + 1] & 0x20;
+    document.getElementById("global.resetoncontinue").checked = (resetOnContinue != 0);
 
     const triggerLength = syx8[cfg_off + 2];
     document.getElementById("global.triglen").value = triggerLength;
@@ -440,9 +446,12 @@ function write_cfg_bytes(syx8) {
     
     var cvRange = 0;
     if (document.getElementById("global.cvrange").value > 5)
-        cvRange = 1;
+        cvRange = 0x10;
     const midiChannel = document.getElementById("global.channel").value - 1;
-    syx8[cfg_off + 1] = (cvRange << 4) | (midiChannel & 0x0F);
+    var resetOnContinue = 0;
+    if (document.getElementById("global.resetoncontinue").checked)
+        resetOnContinue = 0x20;
+    syx8[cfg_off + 1] = resetOnContinue | cvRange | (midiChannel & 0x0F);
 
     const triggerLength = document.getElementById("global.triglen").value;
     syx8[cfg_off + 2] = triggerLength;
@@ -610,6 +619,8 @@ htm += f'''
 <td title="Select the millisecond duration for trigger outputs">Trigger Length</td>
 <td>&nbsp;&nbsp;&nbsp;</td>
 <td title="Select the maximum Control Voltage value">Control Voltage Range</td>
+<td>&nbsp;&nbsp;&nbsp;</td>
+<td title="Reset on MIDI CONTINUE">Reset on MIDI Continue</td>
 </tr>
 <tr>
 <td></td>
@@ -618,6 +629,8 @@ htm += f'''
 <td>{mktrig("global.triglen", 0)}</td>
 <td></td>
 <td>{mkcvrange("global.cvrange", 0)}</td>
+<td></td>
+<td>{mkglobalbool("global.resetoncontinue")}</td>
 </tr>
 </table>
 '''

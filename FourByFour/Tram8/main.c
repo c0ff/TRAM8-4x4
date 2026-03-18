@@ -97,7 +97,7 @@ void timer_init(void) {
 }
 
 /* state globals */
-enum { CONFIGURATION_FORMAT = 3 };
+enum { CONFIGURATION_FORMAT = 4 };
 
 // --- Gate outputs config
 
@@ -136,6 +136,12 @@ struct VoltageState {
     uint8_t param; // Note or Controller number 7 bits
 };
 
+enum GlobalFlags {
+    GlobalVoltageRangeHigh = 0x10,
+    GlobalResetOnContinue = 0x20,
+    GlobalMidiChannelMask = 0x0F,
+};
+
 // --- default config settings
 uint8_t cfg[54] = {
     // head marker
@@ -144,7 +150,7 @@ uint8_t cfg[54] = {
     // Offset: 4
     // common config
     CONFIGURATION_FORMAT, // version
-    (1 << 4) | 9, // CV range 8V, (0 = 5V), default MIDI channel number (0-15)
+    GlobalVoltageRangeHigh | GlobalResetOnContinue| 9, // default MIDI channel number (0-15)
     10, // default trigger length in ms
     0, // reserved (TODO: when in 8V mode, bits mark outputs scaled to 5V)
     
@@ -208,6 +214,7 @@ void voltage_allnotesoff();
 uint8_t eight_volts = 1;
 uint8_t trigger_ticks = 10;
 
+uint8_t midi_reset_on_continue = 1;
 uint8_t midi_clock_run = 0;
 uint8_t midi_cmd_len = 0;
 uint8_t midi_cmd_data[3];
@@ -262,8 +269,9 @@ int parse_settings()
         return 0;
     if (cfg[4] != CONFIGURATION_FORMAT)
         return 0;
-    eight_volts = (cfg[5] >> 4) & 0x01;
-    global_midi_channel = cfg[5] & 0x0F;
+    eight_volts = (cfg[5] & GlobalVoltageRangeHigh) ? 1 : 0;
+    midi_reset_on_continue = (cfg[5] & GlobalResetOnContinue) ? 1 : 0;
+    global_midi_channel = cfg[5] & GlobalMidiChannelMask;
     trigger_ticks = cfg[6];
     // cfg[7] reserved
     
@@ -712,7 +720,7 @@ void midi_realtime(uint8_t msg)
 	   else if (msg == MIDI_MSG_START)
 	       gates_midi_reset(1);
 	   else if (msg == MIDI_MSG_CONTINUE)
-	       gates_midi_reset(0);
+	       gates_midi_reset(midi_reset_on_continue);
 	   else if (msg == MIDI_MSG_STOP)
 	       gates_midi_stop();
 }
@@ -807,7 +815,7 @@ void gates_midi_reset(uint8_t reset_pulse_counters)
                 : (gate_flags & GateMode_MASK) == GateMode_Gate;
             if (needs_reset)
             {
-                gates[i].midi_pulse_counter = 0;
+                gates[i].midi_pulse_counter = pulse_count - 1;
                 gates[i].ticks_until_clear = 0; // gates[i].current_output = 0;
                 (*clear_pin_ptr)(i);
             }

@@ -1,7 +1,12 @@
 # TRAM8 Module 4x4 Firmware
 
-Go to SysEx configurator: https://c0ff.github.io/TRAM8-4x4/tram8_4x4_fw3.html
+Go to SysEx configurator: https://c0ff.github.io/TRAM8-4x4/tram8_4x4_fw4.html
 
+## v4 Features:
+
+ - Added option to reset clock on MIDI Continue command (enabled by default)
+ - Fixed sending clock triggers on pulse 0 (right after MIDI Start).
+ 
 ## v3 Features:
 
  - Offline HTML-based configuration editor
@@ -22,9 +27,9 @@ Timer code for 1ms ticks from https://github.com/thorinf/tram8-plus/
 
 
 ## To use:
- - Download and open locally `FW-4x4 HTML FILES/tram8_4x4_fw3.html`
- - Edit the settings to your liking and get the `tram8_4x4_fw3_edit.syx`
- - Send the `tram8_4x4_fw3_edit.syx` to your Tram8 module in the update mode
+ - Download and open locally `FW-4x4 HTML FILES/tram8_4x4_fw4.html`
+ - Edit the settings to your liking and get the `tram8_4x4_fw4_edit.syx`
+ - Send the `tram8_4x4_fw4_edit.syx` to your Tram8 module in the update mode
  - Enjoy!
 
 
@@ -68,6 +73,7 @@ Starting from editor **1 rev.A** the default 4x4 firmware is embedded into HTML 
  - MIDI Channel: 10
  - Trigger length: 10ms
  - CV range: 0-8V
+ - Reset on MIDI Continue: Yes
  
 ### Gates:
  1. Trigger on NoteOn 36 // TR-8S BD
