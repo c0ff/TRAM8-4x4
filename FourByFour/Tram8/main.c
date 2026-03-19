@@ -97,7 +97,7 @@ void timer_init(void) {
 }
 
 /* state globals */
-enum { CONFIGURATION_FORMAT = 4 };
+enum { CONFIGURATION_FORMAT = 5 };
 
 // --- Gate outputs config
 
@@ -119,7 +119,7 @@ struct GateState {
         uint8_t ticks_until_clear;
         uint8_t current_output;
     };
-    uint8_t midi_pulse_counter;
+    uint16_t midi_pulse_counter;
 };
 
 // --- CV outputs config
@@ -152,7 +152,12 @@ uint8_t cfg[54] = {
     CONFIGURATION_FORMAT, // version
     GlobalVoltageRangeHigh | GlobalResetOnContinue| 9, // default MIDI channel number (0-15)
     10, // default trigger length in ms
-    0, // reserved (TODO: when in 8V mode, bits mark outputs scaled to 5V)
+    (3 << 1) | 1, // Clock Scale: 1/4 note
+        // 4 lower bits: Clock Divider Scale, bit 0: multiply by 3, bits [1:3]: power of 2
+       // Example: value b0000 means 1, b0001 = 3x, b0111 = 24x
+    // TODO: 0, // when in 8V mode, bits mark outputs scaled to 5V
+    // TODO: 0, // reserved
+    // Add global bytes before thsi line.
     
     // Offset: 8
     // MIDI Channel mappings
@@ -171,8 +176,8 @@ uint8_t cfg[54] = {
     GateMode_Trigger | GateSource_Note,  38, // TR-8S SD
     GateMode_Trigger | GateSource_Note,  42, // TR-8S CH
     GateMode_Trigger | GateSource_Note,  46, // TR-8S OH
-    GateMode_Trigger | GateSource_Clock, 32, // 4/3 ppqn
-    GateMode_Trigger | GateSource_Clock, 24, // 1 ppqn
+    GateMode_Trigger | GateSource_Clock,  1, // 1 ppqn
+    GateMode_Trigger | GateSource_Clock,  4, // every 1 bar in 4/4
     GateMode_Gate    | GateSource_Clock,  0, // RUN gate
     GateMode_Trigger | GateSource_Clock,  0, // RESET trigger
     
@@ -214,6 +219,7 @@ void voltage_allnotesoff();
 uint8_t eight_volts = 1;
 uint8_t trigger_ticks = 10;
 
+uint8_t midi_clock_mode = 0;
 uint8_t midi_reset_on_continue = 1;
 uint8_t midi_clock_run = 0;
 uint8_t midi_cmd_len = 0;
@@ -273,7 +279,8 @@ int parse_settings()
     midi_reset_on_continue = (cfg[5] & GlobalResetOnContinue) ? 1 : 0;
     global_midi_channel = cfg[5] & GlobalMidiChannelMask;
     trigger_ticks = cfg[6];
-    // cfg[7] reserved
+    midi_clock_mode = cfg[7] & 0x0F;
+    // cfg[8] bits 4-7 reserved
     
     const uint8_t chan_map_off = 8;
     parse_channel_mapping(cfg + chan_map_off + 0, &gates[0].midi_channel, sizeof(gates[0]));
@@ -801,6 +808,15 @@ void gates_tick_update()
                     (*clear_pin_ptr)(i);           
 }
 
+uint16_t gate_param_to_pulses(uint16_t param)
+{
+    const uint8_t power2 = (midi_clock_mode >> 1) & 0x07;
+    if (midi_clock_mode & 1)
+        return ((param << 1) + param) << power2; // x3
+    else
+        return param << power2;
+}
+
 void gates_midi_reset(uint8_t reset_pulse_counters)
 {
     uint8_t i;
@@ -809,7 +825,7 @@ void gates_midi_reset(uint8_t reset_pulse_counters)
         const uint8_t gate_flags = gates[i].flags;
         if ((gate_flags & GateSource_MASK) == GateSource_Clock)
         {
-            const uint16_t pulse_count = gates[i].param;
+            const uint16_t pulse_count = gate_param_to_pulses(gates[i].param);
             const uint8_t needs_reset = (pulse_count > 0)
                 ? reset_pulse_counters
                 : (gate_flags & GateMode_MASK) == GateMode_Gate;
@@ -838,7 +854,7 @@ void gates_midi_pulse()
         const uint8_t gate_flags = gates[i].flags;
         if ((gate_flags & GateSource_MASK) == GateSource_Clock)
         {
-            const uint16_t pulse_count = gates[i].param;
+            const uint16_t pulse_count = gate_param_to_pulses(gates[i].param);
             if (pulse_count)
             {
                 if (++gates[i].midi_pulse_counter >= pulse_count)

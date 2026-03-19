@@ -9,7 +9,7 @@
 import argparse
 import binascii
 
-CONFIGURATION_FORMAT = 4
+CONFIGURATION_FORMAT = 5
 CONFIGURATION_LENGTH = 54
 
 CONFIGURATION_FN_PREFIX = f'tram8_4x4_fw{CONFIGURATION_FORMAT}'
@@ -44,7 +44,7 @@ def mkgatemode(name, def_val):
     return out
 
 def mkgatesrc(name, def_val):
-    vals=[('Note On', 0), ('Clock Pulses (24 ppqn)', 1)]
+    vals=[('Note On', 0), ('Clock Divider', 1)]
     out = f'<select name="{name}" id="{name}">\n'
     for v,i in vals:
         sel = ' selected' if i == def_val else ''
@@ -135,6 +135,34 @@ def mkcv_js(id):
 
 def mkglobalbool(name):
     return f'<input type="checkbox" name="{name}" id="{name}" />'
+
+def mkclkscale(name, def_val):
+    out = f'<select name="{name}" id="{name}">\n'
+    modes = [
+        (1, 0, "1/64 triplet (24 ppqn)"),
+        (1, 1, "1/32 triplet"),
+        (3, 0, "1/32 note (8 ppqn))"),
+        (1, 2, "1/16 triplet"),
+        (3, 1, "1/16 note (4 ppqn))"),
+        (1, 3, "1/8 triplet"),
+        (3, 2, "1/8 note (2 ppqn)"),
+        (1, 4, "1/4 triplet"),
+        (3, 3, "1/4 note (1 ppqn)"),
+        (1, 5, "1/2 triplet"),
+        (3, 4, "1/2 note"),
+        (1, 6, "Whole triplet"),
+        (3, 5, "Whole note (1 bar in 4/4)"),
+        (1, 7, "2 Whole triplets"),
+        (3, 6, "2 Whole notes (2 bars in 4/4)"),
+        (3, 7, "4 Whole notes (4 bars in 4/4)"),
+    ]
+    for i in modes:
+        scale = i[0] << i[1]
+        sel = ' selected' if scale == def_val else ''
+        val = str(scale)
+        out += f'<option value={val}{sel}>{val}  =  {i[2]}</option>\n'
+    out+= '</select>'
+    return out
 
 # header
 htm = '''
@@ -343,7 +371,13 @@ function parse_cfg(syx8) {
     const triggerLength = syx8[cfg_off + 2];
     document.getElementById("global.triglen").value = triggerLength;
     
-    // TODO: if (cvRange): syx8[cfg_off + 3] is CV outputs 5V downscaling mask.
+    const clockmode = syx8[cfg_off + 3] & 0x0F;
+    debug_log("read clock mode: " + clockmode);
+    const clockscale = (clockmode & 1 ? 3 : 1) << (clockmode >> 1);
+    debug_log("read clock scale = " + clockscale);
+    document.getElementById("global.clockscale").value = clockscale;
+
+    // TODO: if (cvRange): syx8[cfg_off + 4] is CV outputs 5V downscaling mask.
     
     parse_channel_map(syx8, cfg_off + 4, "gate", midiChannel);
     parse_channel_map(syx8, cfg_off + 9, "cv", midiChannel);
@@ -367,7 +401,7 @@ function parse_cfg(syx8) {
         } else {
             document.getElementById("gate" + id + ".src").value = 1;
             //document.getElementById("gate" + id + ".note").value = 0;
-	        document.getElementById("gate" + id + ".pulses").value = param;
+            document.getElementById("gate" + id + ".pulses").value = param;
         }
         CheckGateMode(id);
     }
@@ -441,6 +475,35 @@ function write_channel_map(syx8, map_off, ctl_type) {
         syx8[map_off + 1 + i] = ((chans[i*2 + 1] & 0x0F) << 4) | (chans[i*2 + 0] & 0x0F);
 }
 
+function ispowerof2(val) {
+    return val ? (val & (val - 1)) == 0 : false;
+}
+
+function getpowerof2(val) {
+    var p = 0;
+    while (!(val & 1))
+        val >>= 1, ++p;
+    return p;
+}
+
+function pack_clock_mode(val) {
+    var mode = 0;
+    var d = Math.floor(val/3);
+    debug_log("d = " + d);
+    if (d * 3 == val) // divides by 3
+        mode = 1;
+    else
+        d = val;
+    debug_log("mode = " + mode);
+    //assert(ispowerof2(d));
+    const p2 = getpowerof2(d);
+    debug_log("p2 = " + p2);
+    //assert(p2 < 8);
+    mode |= (p2 & 0x07) << 1;
+    debug_log("clock mode = " + mode);
+    return mode;
+}
+
 function write_cfg_bytes(syx8) {
     const cfg_off = syx_cfg_offset + cfg_head.length;
     
@@ -456,6 +519,10 @@ function write_cfg_bytes(syx8) {
     const triggerLength = document.getElementById("global.triglen").value;
     syx8[cfg_off + 2] = triggerLength;
     
+    const clockScale = document.getElementById("global.clockscale").value;
+    debug_log("write clock scale = " + clockScale);
+    syx8[cfg_off + 3] = pack_clock_mode(clockScale);
+
     write_channel_map(syx8, cfg_off + 4, "gate");
     write_channel_map(syx8, cfg_off + 9, "cv");
 
@@ -620,7 +687,9 @@ htm += f'''
 <td>&nbsp;&nbsp;&nbsp;</td>
 <td title="Select the maximum Control Voltage value">Control Voltage Range</td>
 <td>&nbsp;&nbsp;&nbsp;</td>
-<td title="Reset on MIDI CONTINUE">Reset on MIDI Continue</td>
+<td title="Restart on MIDI CONTINUE">Restart Dividers on MIDI Continue</td>
+<td>&nbsp;&nbsp;&nbsp;</td>
+<td title="Clock Divider Scale">Clock Divider Scale</td>
 </tr>
 <tr>
 <td></td>
@@ -631,6 +700,8 @@ htm += f'''
 <td>{mkcvrange("global.cvrange", 0)}</td>
 <td></td>
 <td>{mkglobalbool("global.resetoncontinue")}</td>
+<td></td>
+<td>{mkclkscale("global.clockscale", 1)}</td>
 </tr>
 </table>
 '''
@@ -651,7 +722,7 @@ htm += f'''
 <td title="Select gate output mode">Mode</td>
 <td title="Select the activation source">Source</td>
 <td title="Note Number">Note</td>
-<td title="Clock: Number of ticks between activations">Clock Divider</td>
+<td title="Clock: Number of ticks between activations">Clock Divisor</td>
 <td title="Note: listen to custom channel number">Use Channel</td>
 <td title="Note: custom MIDI channel number">Channel</td>
 </tr>
