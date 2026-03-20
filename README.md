@@ -37,7 +37,7 @@ Timer code for 1ms ticks from https://github.com/thorinf/tram8-plus/
 4x4 comes from the initial idea and now the default configuration:
 - 4 trigger outputs for notes 36, 38, 42, 46 which correspond to TR-8S BD, SD, CH, OH
 - 4 velocity CV outputs for these notes, 0-8V
-- 4 clock outputs: triplets, quarters, Run gate, Reset trigger
+- 4 clock outputs: beat clock (1 ppqn)), bar clock (4 beats), Run gate, Reset trigger
 - 4 CC to 0-8V CV for controllers 24, 29, 63, 82 which correspond to TR-8S BD, SD, CH, OH levels
 
 Firmware supports both gate and trigger outputs with custom ppqn, CC, and Note support.
