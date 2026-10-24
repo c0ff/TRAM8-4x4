@@ -11,9 +11,13 @@
 
 // by c0ff
 enum MidiMagics {
-    MIDI_MSG_NOTE_OFF       = 0b10000000,
-    MIDI_MSG_NOTE_ON        = 0b10010000,
-    MIDI_MSG_CONTROL_CHANGE = 0b10110000,
+    MIDI_MSG_NOTE_OFF         = 0b10000000, // 3 bytes
+    MIDI_MSG_NOTE_ON          = 0b10010000, // 3 bytes
+    MIDI_MSG_AFTER_TOUCH      = 0b10100000, // 3 bytes
+    MIDI_MSG_CONTROL_CHANGE   = 0b10110000, // 3 bytes
+    MIDI_MSG_PROGRAM_CHANGE   = 0b11000000, // 2 bytes
+    MIDI_MSG_CHANNEL_PRESSURE = 0b11010000, // 2 bytes
+    MIDI_MSG_PITCH_WHEEL      = 0b11100000, // 3 bytes
     
     MIDI_MSG_CLOCK    = 0b11111000,
     MIDI_MSG_START    = 0b11111010,
@@ -26,7 +30,7 @@ enum MidiMagics {
     MIDI_REALTIME_MASK = 0b11111000,
     
     MIDI_CC_ALL_NOTES_OFF  = 123,
-    //MIDI_CC_ALL_CONTROLLERS_OFF = 121,
+    MIDI_CC_ALL_CONTROLLERS_OFF = 121,
     MIDI_CC_ALL_SOUNDS_OFF = 120,
 };
 

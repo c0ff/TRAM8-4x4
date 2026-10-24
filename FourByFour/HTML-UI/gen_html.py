@@ -9,8 +9,9 @@
 import argparse
 import binascii
 
-CONFIGURATION_FORMAT = 5
-CONFIGURATION_LENGTH = 54
+CONFIGURATION_FORMAT = 7
+CONFIGURATION_FORMAT_MIN = 7
+CONFIGURATION_LENGTH = 56
 
 CONFIGURATION_FN_PREFIX = f'tram8_4x4_fw{CONFIGURATION_FORMAT}'
 
@@ -34,25 +35,31 @@ def mktrig(name, def_val):
     out+= '</select>'
     return out
 
-def mkgatemode(name, def_val):
-    vals=[('Gate', 0), ('Trigger', 1), ('RUN gate', 2), ('RESET trigger', 3)]
+def mkclockmode(name):
+    vals=[('Trigger', 0), ('FlipFlop', 1), ('RESET trigger', 0x80), ('RUN gate', 0x81)]
     out = f'<select name="{name}" id="{name}">\n'
     for v,i in vals:
-        sel = ' selected' if i == def_val else ''
-        out += f'<option value="{str(i)}"{sel}>{v}</option>\n'
+        out += f'<option value="{str(i)}">{v}</option>\n'
     out+= '</select>'
     return out
 
-def mkgatesrc(name, def_val):
-    vals=[('Note On', 0), ('Clock Divider', 1)]
+def mknotemode(name):
+    vals=[('Trigger', 0), ('Gate', 1), ('Velocity', 2), ('Dynamic Gate', 3)] # TODO , ('Pitch', 4)
     out = f'<select name="{name}" id="{name}">\n'
     for v,i in vals:
-        sel = ' selected' if i == def_val else ''
-        out += f'<option value="{str(i)}"{sel}>{v}</option>\n'
+        out += f'<option value="{str(i)}">{v}</option>\n'
     out+= '</select>'
     return out
 
-def mknotes(name, def_val):
+def mksrc(name):
+    vals=[('Note On', 0x90), ('After Touch', 0xA0), ('Control Change', 0xB0), ('Channel Pressure', 0xD0), ('Clock Divider', 0xF0)] # TODO: Pitch Wheel 0xE0
+    out = f'<select name="{name}" id="{name}">\n'
+    for v,i in vals:
+        out += f'<option value="{str(i)}">{v}</option>\n'
+    out+= '</select>'
+    return out
+
+def mknotes(name):
     out = f'<select name="{name}" id="{name}">\n'
     notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
     for i in range(0, 128):
@@ -61,8 +68,7 @@ def mknotes(name, def_val):
         if note == 0:
             out += f'<optgroup label="Octave {str(octave)}">'
         v = f'{notes[note]}{str(octave)}'
-        sel = ' selected' if i == def_val else ''
-        out += f'<option value="{str(i)}"{sel}>{v} ({str(i)})</option>\n'
+        out += f'<option value="{str(i)}">{v} ({str(i)})</option>\n'
         if note == 11:
             out += '</optgroup>'
     out+= '</select>'
@@ -71,35 +77,48 @@ def mknotes(name, def_val):
 # TODO: add well-known CC names
 CCs = {
 1 : 'ModWheel',
+2 : 'Breath Controller (coarse)',
+34: 'Breath Controller (fine)',
+4 : 'Foot Pedal (coarse)',
+36: 'Foot Pedal (fine)',
+7 : 'Volume (coarse)',
+39: 'Volume (fine)',
+11: 'Expression (coarse)',
+43: 'Expression (fine)',
+12: 'Effect Control 1 (coarse)',
+44: 'Effect Control 1 (fine)',
+13: 'Effect Control 2 (coarse)',
+45: 'Effect Control 2 (fine)',
 }
-# TODO: add support for 121 All Cotrollers Off
-noCCs = set([120, 123])
+noCCs = set([0, 32, 98, 99, 100, 101, 120, 121, 123])
 
-def mkccs(name, def_val):
+def mkccs(name):
     out = f'<select name="{name}" id="{name}">\n'
     for i in range(0, 128):
         if i in noCCs: continue
         ccname = CCs.get(i)
         v = f'{i} ({ccname})' if ccname else f'{i}' 
-        sel = ' selected' if i == def_val else ''
-        out += f'<option value={i}{sel}>{v}</option>\n'
+        out += f'<option value={i}>{v}</option>\n'
     out+= '</select>'
     return out
     
-def mkgate_html(id, mode, src, note, pulses=0):
-    return f'<tr><td></td><td>{id}</td><td>' +\
-mkgatemode(f"gate{id}.mode", mode) + '</td><td>' +\
-mkgatesrc(f"gate{id}.src", src) + '</td><td>' +\
-mknotes(f"gate{id}.note", note) + '</td><td>' +\
-f'<input type="number" min=1 max=127 name="gate{id}.pulses" id="gate{id}.pulses" value={pulses} /></td>'+\
-f'<td><input type="checkbox" name="gate{id}.usechan" id="gate{id}.usechan" /></td>'+\
-'<td>' + mkchan(f"gate{id}.channel", 0) + '</td></tr>\n'
+def mkout_html(outtype, id):
+    return f'<tr><td></td><td>{id}</td>' +\
+'<td>' + mksrc(f"{outtype}{id}.src") + '</td>' +\
+'<td>' + mkclockmode(f"{outtype}{id}.clkmode") + '</td>' +\
+f'<td><input type="number" min=1 max=127 name="{outtype}{id}.pulses" id="{outtype}{id}.pulses" /></td>'+\
+'<td>' + mknotes(f"{outtype}{id}.note") + '</td>' +\
+'<td>' + mknotemode(f"{outtype}{id}.notemode") + '</td>' +\
+'<td>' + mkccs(f"{outtype}{id}.cc") + '</td>' +\
+f'<td><input type="checkbox" name="{outtype}{id}.usechan" id="{outtype}{id}.usechan" /></td>'+\
+'<td>' + mkchan(f"{outtype}{id}.channel", 0) + '</td>'
+'</tr>\n'
     
-def mkgate_js(id):
-    return f'document.getElementById("gate{id}.mode").onchange=function(){{CheckGateMode({id});}};\n' +\
-           f'document.getElementById("gate{id}.src").onchange=function(){{CheckGateMode({id});}};\n' +\
-           f'document.getElementById("gate{id}.usechan").onchange=function(){{CheckGateMode({id});}};\n'+\
-           f'//CheckGateMode({id});\n\n'
+def mkout_js(oid):
+    return f'document.getElementById("{oid}.src").onchange=function(){{CheckMode("{oid}");}};\n' +\
+           f'document.getElementById("{oid}.clkmode").onchange=function(){{CheckMode("{oid}");}};\n' +\
+           f'document.getElementById("{oid}.usechan").onchange=function(){{CheckMode("{oid}");}};\n'+\
+           f'//CheckMode("{oid}");\n\n'
 
 def mkcvrange(name, def_val):
     vals=[('0-5V', 5), ('0-8V', 8)]
@@ -109,29 +128,6 @@ def mkcvrange(name, def_val):
         out += f'<option value="{str(i)}"{sel}>{v}</option>\n'
     out+= '</select>'
     return out
-
-def mkcvsrc(name, def_val):
-    vals=[('Control Change', 0), ('Note Velocity', 1), ('Note Gate', 2), ('Note Dynamic Gate', 3)]
-    out = f'<select name="{name}" id="{name}">\n'
-    for v,i in vals:
-        sel = ' selected' if i == def_val else ''
-        out += f'<option value="{str(i)}"{sel}>{v}</option>\n'
-    out+= '</select>'
-    return out
-
-def mkcv_html(id, src, note, cc=0):
-    return f'<tr><td></td><td>{id}</td><td>' +\
-mkcvsrc(f"cv{id}.src", src) + '</td><td>' +\
-mknotes(f"cv{id}.note", note) + '</td><td>' +\
-mkccs(f"cv{id}.cc", cc) + '</td><td>' +\
-f'<input type="checkbox" name="cv{id}.usechan" id="cv{id}.usechan" /></td><td>' +\
-mkchan(f"cv{id}.channel", 0) + '</td></tr>\n'
-    
-def mkcv_js(id):
-    return f'document.getElementById("cv{id}.src").onchange=function(){{CheckVoltageSrc({id});}}\n' +\
-           f'document.getElementById("cv{id}.usechan").onchange=function(){{CheckVoltageSrc({id});}};\n'+\
-           f'//CheckVoltageSrc({id});\n\n'
-
 
 def mkglobalbool(name):
     return f'<input type="checkbox" name="{name}" id="{name}" />'
@@ -198,6 +194,7 @@ For updates visit:
 
 htm += f'''
 const CONFIGURATION_FORMAT = {CONFIGURATION_FORMAT};
+const CONFIGURATION_FORMAT_MIN = {CONFIGURATION_FORMAT_MIN};
 const CONFIGURATION_LENGTH = {CONFIGURATION_LENGTH};
 const CONFIGURATION_FILENAME = "{CONFIGURATION_FN_PREFIX}_edit.syx";
 '''
@@ -259,6 +256,9 @@ function debug_log(msg) {
     //window.alert(msg);
 }
 
+function hexstr(i) {
+   return (i+0x100).toString(16).substr(-2).toUpperCase();
+}
 function from_hex(ch) {
     if (ch >= 0x30 && ch <= 0x39)
         return ch - 0x30;
@@ -347,13 +347,43 @@ function parse_channel_map(syx8, map_off, ctl_type, def_chan) {
     }
 }
 
+function parse_8outputs(syx8, cfg_off, outtype) {
+    for (let i = 0; i < 8; ++i) {
+        const src_mode  = syx8[cfg_off + i*2 + 0];
+        const param = syx8[cfg_off + i*2 + 1];
+        const src = src_mode & 0xF0;
+        const mode = src_mode & 0x0F;
+
+        const oid = outtype + (i + 1).toString();
+        debug_log("read out: " + oid + " src_mode: " + hexstr(src_mode) + ", param: " + hexstr(param));
+
+        document.getElementById(oid + ".src").value = src;
+        if (src == 0xF0) { // OutputSource_Clock
+        	if (param == 0)
+        		document.getElementById(oid + ".clkmode").value = mode | 0x80;
+        	else {
+        		document.getElementById(oid + ".clkmode").value = mode;
+        	    document.getElementById(oid + ".pulses").value = param;
+        	}
+        } else if (src == 0x90) { // OutputSource_NoteOn
+        		document.getElementById(oid + ".notemode").value = mode;
+        		document.getElementById(oid + ".note").value = param;
+        } else if (src == 0xA0) { // OutputSource_AfterTouch
+        		document.getElementById(oid + ".note").value = param;
+        } else if (src == 0xB0) { // OutputSource_ControlChange
+        		document.getElementById(oid + ".cc").value = param;
+        }
+        CheckMode(oid);
+    }
+}
+
 function parse_cfg(syx8) {
     syx_cfg_offset = find_cfg(syx8);
     debug_log("Found cfg block at " + syx_cfg_offset);
     
     const cfg_off = syx_cfg_offset + cfg_head.length;
     const ver = syx8[cfg_off];
-    if (ver != CONFIGURATION_FORMAT)
+    if (ver > CONFIGURATION_FORMAT || ver < CONFIGURATION_FORMAT_MIN)
         return report_bad("Unsupported configuration format: " + ver);
 
     const cvRange = syx8[cfg_off + 1] & 0x10;
@@ -379,46 +409,11 @@ function parse_cfg(syx8) {
 
     // TODO: if (cvRange): syx8[cfg_off + 4] is CV outputs 5V downscaling mask.
     
-    parse_channel_map(syx8, cfg_off + 4, "gate", midiChannel);
-    parse_channel_map(syx8, cfg_off + 9, "cv", midiChannel);
+    parse_channel_map(syx8, cfg_off + 6, "gate", midiChannel);
+    parse_channel_map(syx8, cfg_off + 11, "cv", midiChannel);
     
-    // gates
-    const gt_off = cfg_off + 14;
-    for (let i = 0; i < 8; ++i) {
-        const mode  = syx8[gt_off + i*2 + 0];
-        const param = syx8[gt_off + i*2 + 1];
-        const istrigger = mode & 0x01;
-        var modeval = istrigger;
-        if (param == 0)
-            modeval |= 2;
-        const id = i + 1;
-        //debug_log("gate:"+id+" mode:"+mode+" param:"+param);
-        document.getElementById("gate" + id + ".mode").value = modeval;
-        if (mode & 0x02) {
-            document.getElementById("gate" + id + ".src").value = 0;
-	        document.getElementById("gate" + id + ".note").value = param;
-	        //document.getElementById("gate" + id + ".pulses").value = 0;
-        } else {
-            document.getElementById("gate" + id + ".src").value = 1;
-            //document.getElementById("gate" + id + ".note").value = 0;
-            document.getElementById("gate" + id + ".pulses").value = param;
-        }
-        CheckGateMode(id);
-    }
-    
-    // voltages
-    const cv_off = cfg_off + 30;
-    for (let i = 0; i < 8; ++i) {
-        const mode  = syx8[cv_off + i*2 + 0];
-        const param = syx8[cv_off + i*2 + 1];
-        const id = i + 1;
-        document.getElementById("cv" + id + ".src").value = mode;
-        if (mode > 0)
-    	    document.getElementById("cv" + id + ".note").value = param;
-    	else
-	        document.getElementById("cv" + id + ".cc").value = param;
-	    CheckVoltageSrc(id);
-    }
+    parse_8outputs(syx8, cfg_off + 16, "gate");
+    parse_8outputs(syx8, cfg_off + 32, "cv");
 }
 
 function do_parse(sv) {
@@ -504,6 +499,33 @@ function pack_clock_mode(val) {
     return mode;
 }
 
+function write_8outputs(syx8, cfg_off, outtype) {
+    for (let i = 0; i < 8; ++i) {
+        const oid = outtype + (i + 1).toString();
+        const src = document.getElementById(oid + ".src").value;
+
+        var src_mode = src & 0xF0;        
+        var param = 0;
+        if (src == 0xF0) { // OutputSource_Clock
+            const mode = document.getElementById(oid + ".clkmode").value;
+        	src_mode |= (mode & 0x0F);
+        	if (mode < 0x80)
+        	    param = document.getElementById(oid + ".pulses").value;
+        } else if (src == 0x90) { // OutputSource_NoteOn
+        	const mode = document.getElementById(oid + ".notemode").value;
+        	src_mode |= mode;
+        	param = document.getElementById(oid + ".note").value;
+        } else if (src == 0xA0) { // OutputSource_AfterTouch
+        	param = document.getElementById(oid + ".note").value;
+        } else if (src == 0xB0) { // OutputSource_ControlChange
+        	param = document.getElementById(oid + ".cc").value;
+        }
+        debug_log("write out: " + oid + " src_mode: " + hexstr(src_mode) + ", param: " + hexstr(param));
+        syx8[cfg_off + i*2 + 0] = src_mode;
+        syx8[cfg_off + i*2 + 1] = param;
+    }  
+}
+
 function write_cfg_bytes(syx8) {
     const cfg_off = syx_cfg_offset + cfg_head.length;
     
@@ -523,47 +545,11 @@ function write_cfg_bytes(syx8) {
     debug_log("write clock scale = " + clockScale);
     syx8[cfg_off + 3] = pack_clock_mode(clockScale);
 
-    write_channel_map(syx8, cfg_off + 4, "gate");
-    write_channel_map(syx8, cfg_off + 9, "cv");
+    write_channel_map(syx8, cfg_off + 6, "gate");
+    write_channel_map(syx8, cfg_off + 11, "cv");
 
-    // gates
-    const gt_off = cfg_off + 14;
-    for (let i = 0; i < 8; ++i) {
-        var mode;
-        var param;
-        const id = i + 1;
-        const modeval = document.getElementById("gate" + id + ".mode").value;
-        if (modeval > 1) {
-            mode = modeval & 0x01;
-            param = 0;
-        } else {
-            mode = modeval;
-            const isnote = (document.getElementById("gate" + id + ".src").value == 0);
-            if (isnote) {
-                param = document.getElementById("gate" + id + ".note").value;
-                mode |= 0x02;
-            }
-            else
-                param = document.getElementById("gate" + id + ".pulses").value;
-        }
-        //debug_log("gate:"+id+" mode:"+mode+" param:"+param);
-        syx8[gt_off + i*2 + 0] = mode;
-        syx8[gt_off + i*2 + 1] = param;
-    }  
- 
-    // voltages
-    const cv_off = cfg_off + 30;
-    for (let i = 0; i < 8; ++i) {
-        const id = i + 1;
-        const mode = document.getElementById("cv" + id + ".src").value;
-        var param;
-        if (mode > 0)
-    	    param = document.getElementById("cv" + id + ".note").value;
-        else
-    	    param = document.getElementById("cv" + id + ".cc").value;
-        syx8[cv_off + i*2 + 0] = mode;
-        syx8[cv_off + i*2 + 1] = param;
-    }
+    write_8outputs(syx8, cfg_off + 16, "gate");
+    write_8outputs(syx8, cfg_off + 32, "cv");
 }
 
 function tohex(nib) {
@@ -670,6 +656,42 @@ function download_sysex() {
     const out_syx = patch_sysex(syx8);
     save(CONFIGURATION_FILENAME, out_syx);
 }
+
+function CheckMode(oid) {
+	const src = document.getElementById(oid + ".src").value;
+	if (src == 0xF0) { // OutputSource_Clock
+		document.getElementById(oid + ".clkmode").disabled = false;
+    	const mode = document.getElementById(oid + ".clkmode").value;
+    	document.getElementById(oid + ".pulses").disabled = (mode >= 0x80);
+		document.getElementById(oid + ".note").disabled = true;
+		document.getElementById(oid + ".notemode").disabled = true;
+		document.getElementById(oid + ".cc").disabled = true;
+		document.getElementById(oid + ".usechan").disabled = true;
+		document.getElementById(oid + ".channel").disabled = true;
+	} else {
+		document.getElementById(oid + ".clkmode").disabled = true;
+		document.getElementById(oid + ".pulses").disabled = true;
+		document.getElementById(oid + ".usechan").disabled = false;
+		document.getElementById(oid + ".channel").disabled = !document.getElementById(oid + ".usechan").checked;
+		if (src == 0x90) { // OutputSource_NoteOn
+			document.getElementById(oid + ".note").disabled = false;
+			document.getElementById(oid + ".notemode").disabled = false;
+			document.getElementById(oid + ".cc").disabled = true;
+    	} else if (src == 0xA0) { // OutputSource_AfterTouch
+			document.getElementById(oid + ".note").disabled = false;
+			document.getElementById(oid + ".notemode").disabled = true;
+			document.getElementById(oid + ".cc").disabled = true;
+    	} else if (src == 0xB0) { // OutputSource_ControlChange
+			document.getElementById(oid + ".note").disabled = true;
+			document.getElementById(oid + ".notemode").disabled = true;
+			document.getElementById(oid + ".cc").disabled = false;
+    	} else if (src == 0xD0) { // OutputSource_ChannelPressure
+			document.getElementById(oid + ".note").disabled = true;
+			document.getElementById(oid + ".notemode").disabled = true;
+			document.getElementById(oid + ".cc").disabled = true;
+    	}
+    }
+}
 </script>
 '''
 
@@ -706,60 +728,42 @@ htm += f'''
 </table>
 '''
 
-# gates
-htm += f'''
-<hr>
-
-<p>
-<b>GATE/TRIGGER OUTPUTS</b><br>
-<i>NOTE: Gate from a Clock source produces a flip-flop (a square LFO with the period twice the gate duration)</i>
-</p>
-
-<table>
+# outputs
+def make_outhdr(name):
+    return f'''
 <tr>
 <td>&nbsp;&nbsp;&nbsp;</td>
-<td title="Gate output">Gate Output</td>
-<td title="Select gate output mode">Mode</td>
-<td title="Select the activation source">Source</td>
-<td title="Note Number">Note</td>
+<td title="{name} Output">{name} Output</td>
+<td title="Source">Source</td>
+<td title="Clock Mode">Clock Mode</td>
 <td title="Clock: Number of ticks between activations">Clock Divisor</td>
+<td title="Note Number">Note</td>
+<td title="Note Mode">Note Mode</td>
+<td title="CC number">CC Number</td>
 <td title="Note: listen to custom channel number">Use Channel</td>
 <td title="Note: custom MIDI channel number">Channel</td>
 </tr>
 '''
 
-for i in incrange(1, 8):
-    htm += mkgate_html(i, 0, 0, 0)
+# gates/triggers
+htm += '''
+<hr>
 
-htm+='''
-<script language="javascript">
-function CheckGateMode(id) {
-	const d = (document.getElementById("gate" + id + ".mode").value > 1);
-	document.getElementById("gate" + id + ".src").disabled = d;
-	if (d) {
-	   document.getElementById("gate" + id + ".note").disabled = d;
-	   document.getElementById("gate" + id + ".pulses").disabled = d;
-	   document.getElementById("gate" + id + ".usechan").disabled = d;
-	   document.getElementById("gate" + id + ".channel").disabled = d;
-    } else {
-	   var isnote = (document.getElementById("gate" + id + ".src").value == 0);
-	   document.getElementById("gate" + id + ".note").disabled = !isnote;
-	   document.getElementById("gate" + id + ".pulses").disabled = isnote;
-	   if (isnote) {
-	       var uc = document.getElementById("gate" + id + ".usechan")
-	       uc.disabled = false;
-	       document.getElementById("gate" + id + ".channel").disabled = !uc.checked;
-	   } else {
-    	   document.getElementById("gate" + id + ".usechan").disabled = true;
-	       document.getElementById("gate" + id + ".channel").disabled = true;
-	   }
-    }
-}
+<p>
+<b>GATE/TRIGGER OUTPUTS</b><br>
+<i>NOTE: Flip-Flop is a square LFO with full period twice the clock divider duration)</i>
+<i>NOTE: Continuous sources produce high output for values >=64.</i>
+</p>
+<table>
 '''
-
+htm += make_outhdr('Gate')
 for i in incrange(1, 8):
-    htm += mkgate_js(str(i))
-
+    htm += mkout_html('gate', i)
+htm += '''
+<script>
+'''
+for i in incrange(1, 8):
+    htm += mkout_js('gate' + str(i))
 htm+='''
 </script>
 </table>
@@ -773,34 +777,15 @@ htm += '''
 <b>CONTROL VOLTAGE OUTPUTS</b></p>
 
 <table>
-<tr>
-<td>&nbsp;&nbsp;&nbsp;</td>
-<td title="CV output">CV Output</td>
-<td title="Select CV Source">CV Source</td>
-<td title="Note Number">Note</td>
-<td title="CC number">CC Number</td>
-<td title="Listen to custom channel number">Use Channel</td>
-<td title="Custom MIDI channel number">Channel</td>
-</tr>
 '''
-
+htm += make_outhdr('CV')
 for i in incrange(1, 8):
-    htm += mkcv_html(i, 0, 0, 0)
-
-htm+='''
-<script language="javascript">
-function CheckVoltageSrc(id) {
-	const isnote = (document.getElementById("cv" + id + ".src").value > 0);
-	document.getElementById("cv" + id + ".note").disabled = !isnote;
-	document.getElementById("cv" + id + ".cc").disabled = isnote;
-	var uc = document.getElementById("cv" + id + ".usechan")
-	document.getElementById("cv" + id + ".channel").disabled = !uc.checked;
-}
+    htm += mkout_html('cv', i)
+htm += '''
+<script>
 '''
-
 for i in incrange(1, 8):
-    htm += mkcv_js(str(i))
-
+    htm += mkout_js('cv' + str(i))
 htm+='''
 </script>
 </table>
