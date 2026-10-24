@@ -1,6 +1,6 @@
 # TRAM8 Module 4x4 Firmware
 
-Go to SysEx configurator: https://c0ff.github.io/TRAM8-4x4/tram8_4x4_fw5.html
+Go to SysEx configurator: https://c0ff.github.io/TRAM8-4x4/tram8_4x4_fw7.html
 
 ## Features:
  - Offline HTML-based configuration editor
@@ -40,6 +40,7 @@ Timer code for 1ms ticks from https://github.com/thorinf/tram8-plus/
 - 4 velocity CV outputs for these notes, 0-8V
 - 4 clock outputs: beat clock (1 ppqn)), bar clock (4 beats), Run gate, Reset trigger
 - 4 CC to 0-8V CV for controllers 24, 29, 63, 82 which correspond to TR-8S BD, SD, CH, OH levels
+
 But now it's just because it can ride everywhere.
 
 Firmware supports both gate and trigger outputs with custom ppqn, CC, and Note support.
