@@ -692,6 +692,7 @@ function CheckMode(oid) {
     	}
     }
 }
+
 </script>
 '''
 
@@ -798,7 +799,19 @@ def add_footer(htm):
 <form name="sysex_out" onsubmit="download_sysex(); event.preventDefault()">
 <input type="submit" value="Get the configured SysEx" onchange="download_sysex()">
 </form>
-<hr>
+<hr />
+<p><b>MIDI OUT</b></p>
+
+<select name="MIDI Out" id="midiOut" onchange="checkMidiOut()" disabled=true>
+</select>
+<form name="midi_scan" id="midi_scan" onsubmit="enumMidiOuts(); event.preventDefault()">
+<input type="submit" id="action" value="Rescan MIDI outputs" onchange="enumMidiOuts()" disabled=true>
+</form><br />
+
+<form name="midi_send" id="midi_send" onsubmit="sendSysEx(); event.preventDefault()">
+<input type="submit" id="action" value="Send SysEx" onchange="sendSysEx()" disabled=true>
+</form>
+<hr />
 <p>LPZW TRAM8 4x4 firmware<br />
 CC BY-NC-ND 4.0 Dmitry S. Baikov<br />
 <a href="https://github.com/c0ff/TRAM8-4x4">https://github.com/c0ff/TRAM8-4x4</a></p>
@@ -813,11 +826,80 @@ def add_firmware(htm, fw_file):
 <script>
 // default 4x4 Firmware SysEx
 const firmware_syx = Uint8Array.fromHex("{fw_hex}");
-''' + '''
-window.onload = function() { parse_sysex(firmware_syx); };
+window.onload = function() {{ parse_sysex(firmware_syx); }};
 </script>
 '''
     return htm + ah
+    
+def add_midi(htm):
+    return htm + '''
+<script>
+// WebMIDI support
+let midi = null; // global MIDIAccess object
+
+function checkMidiOut() {
+    sel = document.getElementById("midiOut").value;
+    if (sel)
+        document.forms.namedItem("midi_send").elements.namedItem("action").disabled = false;
+    else
+        document.forms.namedItem("midi_send").elements.namedItem("action").disabled = true;
+}
+
+function enumMidiOuts() {
+  if (midi)
+    document.forms.namedItem("midi_scan").elements.namedItem("action").disabled = false;
+  else
+    document.forms.namedItem("midi_scan").elements.namedItem("action").disabled = true;
+
+  midi_outs = document.getElementById("midiOut");
+  let oldOuts = midi_outs.length;
+  if (oldOuts)
+    for (let i = oldOuts - 1 ; i >= 0; --i)
+      midi_outs.remove(i);
+      
+  if (midi)
+    midi.outputs.forEach(function(port, key){
+      var opt = document.createElement("option");
+      opt.value = port.id;
+      opt.text = port.name;
+      midi_outs.add(opt);    
+    });
+
+  let has_outputs = midi_outs.length > 0;
+  midi_outs.disabled = !has_outputs;
+  document.forms.namedItem("midi_send").elements.namedItem("action").disabled = !has_outputs;
+}
+
+function sendSysEx() {
+  if (midi) {
+      var outport = midi.outputs.get(document.getElementById("midiOut").value);
+    if (outport) {
+      var syx8 = new Uint8Array(syx_bytes.slice());
+      write_cfg_bytes(syx8);
+      const out_syx = patch_sysex(syx8);
+      outport.send(out_syx);
+    }
+  }
+}
+
+function noMidiAccess(msg) {
+    console.error(`Failed to get MIDI access - ${msg}`);
+    midi = null;
+}
+
+function onMIDISuccess(midiAccess) {
+  console.log("MIDI ready!");
+  midi = midiAccess;
+  enumMidiOuts();
+}
+
+try {
+  navigator.requestMIDIAccess({sysex: true, software: false}).then(onMIDISuccess, noMidiAccess);
+} catch (err) {
+  noMidiAccess("not supported");
+}
+</script>
+'''
 
 def main():
     global htm
@@ -828,7 +910,8 @@ def main():
     
     if args.firmware_sysex:
         htm = add_firmware(htm, args.firmware_sysex)
-    
+        
+    htm = add_midi(htm)
     htm = add_footer(htm)
     
     if args.output:
